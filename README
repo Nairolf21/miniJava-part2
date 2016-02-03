@@ -1,6 +1,6 @@
 The minijavac compiler.
 
-A compilation project for Thrid year students of Telecom Bretagne.
+A compilation project for third year students of Telecom Bretagne.
 
 'ocamlbuild Main.byte' (or native) to build the compiler. The main file
 is Main/Main.ml, it should not be modified. It opens the given file,
@@ -18,6 +18,8 @@ with opam. For example, to use colored terminal output you
 use 'opam install ANSITerminal'.
 Then you must inform ocamlbuild to use the ocamlfind tool :
 'ocamlbuild -use-ocamlfind Main.byte -- tests/UnFichierDeTest.java'
+and you must add the library to the file `_tags`, for example : 
+`true: package(ANSITerminal)
 et vous devez ajouter au fichier _tags la librarie en question par exemple :
 true: package(ANSITerminal)
 
