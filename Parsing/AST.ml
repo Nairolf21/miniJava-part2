@@ -431,6 +431,5 @@ let print_package p =
 	       
 let print_program p =
   match p.package with
-  | None -> ()
-  | Some pack -> print_package pack ;
-  List.iter (fun t -> print_type "" t; print_newline()) p.type_list
+  | None -> ();  List.iter (fun t -> print_type "" t; print_newline()) p.type_list
+  | Some pack -> print_package pack ; List.iter (fun t -> print_type "" t; print_newline()) p.type_list
