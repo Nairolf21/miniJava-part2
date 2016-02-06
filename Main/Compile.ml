@@ -1,14 +1,16 @@
 open Parser
-open Compile_AST
+open TypeAST
 
 let execute lexbuf verbose = 
   try 
     let ast = compilationUnit Lexer.token lexbuf in
     print_endline "successfull parsing";
-    let memory = compile_ast ast in
-    print_endline "successful class compilation";
-    Memory_Model.print_memory memory;
-    if verbose then AST.print_program ast 
+    if verbose then AST.print_program ast ;
+    let type_AST = TypeAST.typing ast in
+    print_endline "successfull typing";
+    if verbose then TypeAST.print_typing ast ;
+
+
   with 
     | Error ->
       print_string "Syntax error: ";
