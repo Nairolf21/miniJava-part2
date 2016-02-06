@@ -3,22 +3,25 @@ open Type
 
 
 
-
 (* Typing functions *)
 
 let typing exp =
 	match exp.package with
-	| None -> Void
-(* 	| Some pack -> type_package pack ; List.iter (fun x -> type_type x ) exp.type_list
- *)
+	| None -> Null
+	| Some pack -> String(String.concat "." pack) 
 
 
 
 
 (* Printing functions *)
+  
+let rec print_tpackage p =
+	match p with 
+	| [] -> ()
+	| [h] -> print_endline "package"
+	| h::t -> print_string "package."; print_tpackage t
 
 let print_typing exp =
-	match exp.package with
-	| None -> print_endline "No package"
-(* 	| Some pack -> type_package pack ; List.iter (fun x -> print_type_type x ) exp.type_list
- *)
+  match exp.package with
+  | None -> ()
+  | Some pack -> print_tpackage pack ;
