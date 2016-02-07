@@ -16,8 +16,8 @@ let typing exp =
 let rec print_tpackage p =
 	match p with 
 	| [] -> ()
-	| [h] -> print_endline ("package"^h)
-	| h::t -> print_string ("package"^h^"."); print_tpackage t
+	| [h] -> print_endline ("package'"^h^"'")
+	| h::t -> print_string ("package'"^h^"'."); print_tpackage t
 
 let print_typing exp =
   match exp.package with
