@@ -30,4 +30,4 @@ testMac.sh
 taches.xlsx
 *.out
 *kate-swp
-
+*.swp
