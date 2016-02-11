@@ -23,36 +23,6 @@ type memory =
         class_desc_list : class_desc list
     }
 
-(* AST.t -> string -> memory *)
-let add_class_to_memory astclass id_class mem =
-    {
-        meth_table =  add_methods astclass id_class mem.meth_table;
-        class_desc_list = mem.class_desc_list @ [create_class_desc c h.id]
-    }
-
-let rec add_classes_to_memory type_list mem =
-    match type_list with 
-    | [] -> mem
-    | h :: t -> match h with 
-                | Inter -> mem
-                | Class c -> add_classes_to_memory t (add_class_to_memory c h.id mem)
-
-
-let rec compile_classes ast = 
-    add_classes_to_memory ast.type_list { meth_table = []; class_desc_list = [] }
-
-(* AST.astclass -> string -> compiled_method list *)
-let rec add_methods astclass id_class meth_table =
-    match astclass.cmethods with 
-    | [] -> meth_table
-    | h :: t -> add_methods astclass id_class (meth_table @ [create_comp_method id_class h])
-
-let create_comp_method id_class astmethod =
-    {
-        comp_name = id_class^"_"^astmethod.cname;
-        meth = astmethod
-    }
-
 (* Creates an object descriptor based on an AST.astclass. Should be called from 
  * create_class_desc_list. *)
 (* astclass -> string -> class_desc *)
@@ -61,6 +31,34 @@ let create_class_desc astclass id =
     let methodlist= List.map (fun meth -> meth.mname) astclass.cmethods in
     { name = id; attributes = namelist; method_names = methodlist }
 
+(* AST.astclass -> string -> compiled_method list *)
+let rec add_methods astclass id_class meth_table =
+    match astclass.cmethods with 
+    | [] -> meth_table
+    | h :: t -> add_methods astclass id_class (meth_table @ [create_comp_method id_class h])
+
+and create_comp_method id_class astmethod =
+    {
+        comp_name = id_class^"_"^astmethod.mname;
+        meth = astmethod
+    }
+
+let rec add_classes_to_memory type_list mem =
+    match type_list with 
+    | [] -> mem
+    | h :: t -> match h.info with 
+                | Inter -> mem
+                | Class c -> add_classes_to_memory t (add_class_to_memory c h.id mem)
+
+(* AST.t -> string -> memory *)
+and add_class_to_memory astclass id_class mem =
+    {
+        meth_table =  add_methods astclass id_class mem.meth_table;
+        class_desc_list = mem.class_desc_list @ [create_class_desc astclass id_class]
+    }
+
+let compile_classes ast = 
+    add_classes_to_memory ast.type_list { meth_table = []; class_desc_list = [] }
 
 (* Creates a list of object descriptors from an AST.t.
  * TODO: Read the package info. For the moment, it only construct the list for
