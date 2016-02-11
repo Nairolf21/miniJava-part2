@@ -6,6 +6,8 @@ let execute lexbuf verbose =
     let ast = compilationUnit Lexer.token lexbuf in
     print_endline "successfull parsing";
     let memory = compile_classes ast in
+    print_endline "successful class compilation";
+    (*print_memory memory;*)
     if verbose then AST.print_program ast 
   with 
     | Error ->
