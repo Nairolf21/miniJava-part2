@@ -35,11 +35,11 @@ let create_class_desc astclass id =
 let rec add_methods class_meth_list id_class meth_table =
     match class_meth_list with 
     | [] -> meth_table
-    | h :: t -> add_methods t id_class (meth_table @ [create_comp_method id_class h])
+    | h :: t -> add_methods t id_class (meth_table @ [create_meth_entry id_class h])
 
 (*and add_methods*)
 
-and create_comp_method id_class astmethod =
+and create_meth_entry id_class astmethod =
     {
         comp_name = id_class^"_"^astmethod.mname;
         meth = astmethod
