@@ -10,7 +10,7 @@ type class_desc =
         method_names : string list
     }
 
-type compiled_method = 
+type meth_table_entry = 
     {
         comp_name : string;
         meth : astmethod
@@ -19,7 +19,7 @@ type compiled_method =
 
 type memory =
     {
-        meth_table : compiled_method list;
+        meth_table : meth_table_entry list;
         class_desc_list : class_desc list
     }
 
@@ -31,7 +31,7 @@ let create_class_desc astclass id =
     let methodlist= List.map (fun meth -> meth.mname) astclass.cmethods in
     { name = id; attributes = namelist; method_names = methodlist }
 
-(* AST.astclass -> string -> compiled_method list *)
+(* AST.astclass -> string -> meth_table_entry list *)
 let rec add_methods class_meth_list id_class meth_table =
     match class_meth_list with 
     | [] -> meth_table
