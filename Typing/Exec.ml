@@ -10,20 +10,33 @@ type class_desc =
         method_names : string list
     }
 
+(* Method table entry. Maps the name of the method (ClassName_methodName) 
+ * to the AST method representation.
+ * Should be created using create_meth_table_entry *)
 type meth_table_entry = 
     {
         comp_name : string;
         meth : astmethod
     }
 
+let create_meth_table_entry id_class astmethod =
+    {
+        comp_name = id_class^"_"^astmethod.mname;
+        meth = astmethod
+    }
 
+(* Represents the memory structures built to prepare the execution.
+ * It is constructed from the ast using the function compile_classes 
+ * meth_table: method table. Maps a unique string name for each method and the AST representation of said method.
+ * class_desc_list: list storing the class descriptors *)
+(* TODO: define the functions to access these lists *)
 type memory =
     {
         meth_table : meth_table_entry list;
         class_desc_list : class_desc list
     }
 
-(* Creates an object descriptor based on an AST.astclass. Should be called from 
+(* Creates an class descriptor based on an AST.astclass. Should be called from 
  * create_class_desc_list. *)
 (* astclass -> string -> class_desc *)
 let create_class_desc astclass id = 
@@ -35,15 +48,10 @@ let create_class_desc astclass id =
 let rec add_methods class_meth_list id_class meth_table =
     match class_meth_list with 
     | [] -> meth_table
-    | h :: t -> add_methods t id_class (meth_table @ [create_meth_entry id_class h])
+    | h :: t -> add_methods t id_class (meth_table @ [create_meth_table_entry id_class h])
 
 (*and add_methods*)
 
-and create_meth_entry id_class astmethod =
-    {
-        comp_name = id_class^"_"^astmethod.mname;
-        meth = astmethod
-    }
 
 let rec add_classes_to_memory type_list mem =
     match type_list with 
@@ -59,6 +67,7 @@ and add_class_to_memory astclass id_class mem =
         class_desc_list = mem.class_desc_list @ [create_class_desc astclass id_class]
     }
 
+(* TODO: Inheritance *)
 let compile_classes ast = 
     add_classes_to_memory ast.type_list { meth_table = []; class_desc_list = [] }
 
