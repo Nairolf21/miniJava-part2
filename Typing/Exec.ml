@@ -75,6 +75,7 @@ let compile_classes ast =
 (*Printing functions *)
 
 let print_class_desc cd = 
+    print_endline "";
     print_endline ("name: "^cd.name);
     print_endline "Attrbutes:";
     List.iter (fun el -> print_endline el) cd.attributes;
