@@ -14,23 +14,6 @@
  *
  * */
 
-/* Expected class descriptor:
- *
- * Expected method table names:
- *  - Animal_walk
- *
- * Exprected attribute list:
- *  - legNumber
- *  - name
- *
- * */
-public class Animal {
-    private int legNumber;
-    private String name;
-
-    public void walk() {}
-
-}
 
 /* Expected class descriptor: 
  *
@@ -55,5 +38,23 @@ public class Cat extends Animal {
     public void die() {
         livesLeft--;
     }
+
+}
+
+/* Expected class descriptor:
+ *
+ * Expected method table names:
+ *  - Animal_walk
+ *
+ * Exprected attribute list:
+ *  - legNumber
+ *  - name
+ *
+ * */
+public class Animal {
+    private int legNumber;
+    private String name;
+
+    public void walk() {}
 
 }
