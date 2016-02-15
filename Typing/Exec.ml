@@ -52,6 +52,30 @@ let rec add_methods class_meth_list id_class meth_table =
 
 (*and add_methods*)
 
+let rec find_asttype_by_ref type_list ref =
+    match type_list with
+    | h :: t -> if h.id = ref.tid then Some h 
+                else find_asttype_by_ref t ref
+    | [] -> None
+
+and find_astclass_by_ref type_list ref =
+    let asttype = find_asttype_by_ref type_list ref in
+    match asttype with
+    | None -> None
+    | Some a -> match a.info with
+                | Inter -> None
+                | Class c -> Some c
+
+let find_class_desc_in_memory mem class_id =
+    let rec find_class_desc_rec class_desc_list class_id =
+        match class_desc_list with
+        | [] -> None
+        | h :: t -> if h.name = class_id then Some h
+                    else find_class_desc_rec t class_id
+    in
+    find_class_desc_rec mem.class_desc_list class_id
+    
+
 
 let rec add_classes_to_memory type_list mem =
     match type_list with 
@@ -62,10 +86,16 @@ let rec add_classes_to_memory type_list mem =
 
 (* AST.t -> string -> memory *)
 and add_class_to_memory astclass id_class mem =
+    print_string "treating class: ";
+    print_endline id_class;
+    print_string "parent ref_type: ";
+    print_endline (stringOf_ref astclass.cparent);
     {
         meth_table =  add_methods astclass.cmethods id_class mem.meth_table;
         class_desc_list = mem.class_desc_list @ [create_class_desc astclass id_class]
     }
+
+
 
 (* TODO: Inheritance *)
 let compile_classes ast = 
