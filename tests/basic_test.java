@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 class A { 
 	int a1 = 1;
 	int[] a = { 3,4,5 };
