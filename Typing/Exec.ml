@@ -84,26 +84,32 @@ let rec add_classes_to_memory type_list mem =
                 | Inter -> mem
                 | Class c -> add_classes_to_memory t (add_class_to_memory type_list c h.id mem)
 
+
+and is_asttype_compiled asttype mem =
+    let rec is_asttype_in_class_desc_list class_desc_list asttype =
+    match class_desc_list with 
+    | [] -> false
+    | h :: t -> if h.name = asttype.id then true
+                else is_asttype_in_class_desc_list t asttype
+    in
+    is_asttype_in_class_desc_list mem.class_desc_list asttype
+
 (* AST.t -> string -> memory *)
 and add_class_to_memory type_list astclass id_class mem =
     print_string "treating class: ";
     print_endline id_class;
     print_string "parent ref_type: ";
     print_endline (stringOf_ref astclass.cparent);
-    let class_in_memory = find_class_desc_in_memory mem id_class in
-    match class_in_memory with 
-    | None -> compile
-    | Some c -> 
     {
         meth_table =  add_methods astclass.cmethods id_class mem.meth_table;
         class_desc_list = mem.class_desc_list @ [create_class_desc astclass id_class]
     }
 
 and compile_parent type_list astclass id_class mem =
-    let parent_class = find_asttype_by_ref (astclass.cparent) in
+    let parent_class = find_asttype_by_ref type_list (astclass.cparent) in
     match parent_class with 
     | None -> mem
-    | Some t -> match t with
+    | Some t -> match t.info with
                 | Inter -> mem
                 | Class c -> add_class_to_memory type_list c t.id mem
 
