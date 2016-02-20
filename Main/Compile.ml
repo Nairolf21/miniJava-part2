@@ -1,13 +1,13 @@
 open Parser
-open Exec
+open Compile_AST
 
 let execute lexbuf verbose = 
   try 
     let ast = compilationUnit Lexer.token lexbuf in
     print_endline "successfull parsing";
-    let memory = compile_classes ast in
+    let memory = compile_ast ast in
     print_endline "successful class compilation";
-    print_memory memory;
+    Exec.print_memory memory;
     if verbose then AST.print_program ast 
   with 
     | Error ->
