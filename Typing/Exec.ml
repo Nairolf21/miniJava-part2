@@ -10,6 +10,13 @@ type class_desc =
         method_names : string list
     }
 
+let object_class_desc =
+    {
+        name = "Object";
+        attributes = [];
+        method_names = ["Object_toString"]
+    }
+
 (* Method table entry. Maps the name of the method (ClassName_methodName) 
  * to the AST method representation.
  * Should be created using create_meth_table_entry *)
@@ -82,8 +89,9 @@ let rec add_classes_to_memory type_list mem =
     | [] -> mem
     | h :: t -> match h.info with 
                 | Inter -> mem
-                | Class c -> add_classes_to_memory t (add_class_to_memory type_list c h.id mem)
+                | Class c -> add_classes_to_memory t (add_class_to_memory c h.id mem)
 
+ 
 
 and is_asttype_compiled asttype mem =
     let rec is_asttype_in_class_desc_list class_desc_list asttype =
@@ -95,7 +103,7 @@ and is_asttype_compiled asttype mem =
     is_asttype_in_class_desc_list mem.class_desc_list asttype
 
 (* AST.t -> string -> memory *)
-and add_class_to_memory type_list astclass id_class mem =
+and add_class_to_memory astclass id_class mem =
     print_string "treating class: ";
     print_endline id_class;
     print_string "parent ref_type: ";
@@ -111,7 +119,7 @@ and compile_parent type_list astclass id_class mem =
     | None -> mem
     | Some t -> match t.info with
                 | Inter -> mem
-                | Class c -> add_class_to_memory type_list c t.id mem
+                | Class c -> add_class_to_memory c t.id mem
 
 (* TODO: Inheritance *)
 let compile_classes ast = 
