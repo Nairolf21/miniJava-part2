@@ -1,4 +1,4 @@
-package A.B;
-
 class A{
+	B b;
+	String s = 2;
 }
