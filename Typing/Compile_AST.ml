@@ -53,10 +53,9 @@ and add_astclass_to_memory astclass id_class id_parent mem =
             | None -> mem
             | Some parent_class_desc ->
             let child_class_desc = create_class_desc_with_parent astclass id_class parent_class_desc in
-            let child_meth_list = [] in (*TODO: Create meth list with parent info*)
 {
     class_desc_list = mem.class_desc_list @ [child_class_desc];
-    meth_table = mem.meth_table @ child_meth_list
+    meth_table = mem.meth_table @ (method_entry_list_from_astclass astclass id_class)
 
 }
 
@@ -68,6 +67,14 @@ and create_class_desc_with_parent astclass id parent_class_desc =
         attributes = parent_class_desc.attributes @ namelist; 
         method_names = parent_class_desc.method_names @ methodlist 
     }
+
+and method_entry_list_from_astclass astclass id_class =
+    let rec map_rec method_list id_class =
+        match method_list with 
+        | [] -> []
+        | h :: t -> [create_meth_table_entry id_class h] @ map_rec t id_class
+    in
+    map_rec astclass.cmethods id_class
 
 and find_class_desc_by_ref id_class class_desc_list =
     match class_desc_list with
