@@ -14,7 +14,7 @@ let object_class_desc =
     {
         name = "Object";
         attributes = [];
-        method_names = ["Object_toString"]
+        method_names = ["toString"]
     }
 
 (* Method table entry. Maps the name of the method (ClassName_methodName) 

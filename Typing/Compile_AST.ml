@@ -53,10 +53,10 @@ and add_astclass_to_memory astclass id_class id_parent mem =
             | None -> mem
             | Some parent_class_desc ->
             let child_class_desc = create_class_desc_with_parent astclass id_class parent_class_desc in
-            let child_meth_list = create_child_meth_list
+            let child_meth_list = [] in (*TODO: Create meth list with parent info*)
 {
     class_desc_list = mem.class_desc_list @ [child_class_desc];
-    meth_table = add_methods child_class_desc.method_names asttype.id mem.meth_table
+    meth_table = mem.meth_table @ child_meth_list
 
 }
 
@@ -65,7 +65,7 @@ and create_class_desc_with_parent astclass id parent_class_desc =
     let methodlist= List.map (fun meth -> meth.mname) astclass.cmethods in
     { 
         name = id; 
-        attributes = parent_class_desc.attributs @ namelist; 
+        attributes = parent_class_desc.attributes @ namelist; 
         method_names = parent_class_desc.method_names @ methodlist 
     }
 
@@ -74,3 +74,4 @@ and find_class_desc_by_ref id_class class_desc_list =
     | [] -> None
     | h :: t -> if h.name = id_class then Some h
                 else find_class_desc_by_ref id_class t
+
