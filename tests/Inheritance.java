@@ -3,7 +3,8 @@
  * Expected method table:
  *
  *  - Animal_walk
- *  - Cat_walk
+ *  - Animal_run
+ *  - Cat_run
  *  - Cat_meow
  *  - Cat_die
  *
@@ -18,9 +19,10 @@
 /* Expected class descriptor: 
  *
  * Expected method table names:
- *  - Cat_walk
- *  - Cat_meow
- *  - Cat_die
+ *  - walk -> Animal_walk
+ *  - run  -> Cat_run
+ *  - meow -> Cat_meow
+ *  - die  -> Cat_die
  *
  * Exprected attribute list:
  *  - legNumber
@@ -33,6 +35,8 @@ public class Cat extends Animal {
     /* livesLeft should be between 0 and 9 */
     private int livesLeft;
 
+	public void run() {}
+
     public void meow() {}
 
     public void die() {
@@ -44,7 +48,8 @@ public class Cat extends Animal {
 /* Expected class descriptor:
  *
  * Expected method table names:
- *  - Animal_walk
+ *  - walk -> Animal_walk
+ *  - run  -> Animal_run
  *
  * Exprected attribute list:
  *  - legNumber
@@ -56,5 +61,6 @@ public class Animal {
     private String name;
 
     public void walk() {}
+	public void run() {}
 
 }
