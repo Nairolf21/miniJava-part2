@@ -1,21 +1,35 @@
 open AST
 open Type
 
+type method_name_map = { mnp_name : string; mnp_method_table_key : string }
+
+let mnp_name_eq a b =
+    if a.mnp_name = b.mnp_name then true
+    else false
+
 (* TODO: Be more specific with the attributes : add modifiers and type ?
  * Or is it to be made by the typing team ?*)
 type class_desc = 
     {
         name : string;
         attributes : string list;
-        method_names : string list
+        method_names : method_name_map list
     }
 
 let object_class_desc =
     {
         name = "Object";
         attributes = [];
-        method_names = ["toString"]
+        method_names = [{ mnp_name = "toString"; mnp_method_table_key = "Object_toString"} ]
     }
+
+let add_method_to_class_desc mname meth_table_key class_desc =
+    {
+        name = class_desc.name;
+        attributes = class_desc.attributes;
+        method_names = class_desc.method_names @ [{ mnp_name = mname; mnp_method_table_key = meth_table_key}]
+    }
+
 
 (* Method table entry. Maps the name of the method (ClassName_methodName) 
  * to the AST method representation.
@@ -42,7 +56,7 @@ type memory =
         meth_table : meth_table_entry list;
         class_desc_list : class_desc list
     }
-
+(*
 (* Creates an class descriptor based on an AST.astclass. Should be called from 
  * create_class_desc_list. *)
 (* astclass -> string -> class_desc *)
@@ -58,13 +72,13 @@ let rec add_methods class_meth_list id_class meth_table =
     | h :: t -> add_methods t id_class (meth_table @ [create_meth_table_entry id_class h])
 
 (*and add_methods*)
-
+*)
 let rec find_asttype_by_ref type_list ref =
     match type_list with
     | h :: t -> if h.id = ref.tid then Some h 
                 else find_asttype_by_ref t ref
     | [] -> None
-
+(*
 and find_astclass_by_ref type_list ref =
     let asttype = find_asttype_by_ref type_list ref in
     match asttype with
@@ -125,8 +139,14 @@ and compile_parent type_list astclass id_class mem =
 let compile_classes ast = 
     add_classes_to_memory ast.type_list { meth_table = []; class_desc_list = [] }
 
+*)
 
 (*Printing functions *)
+
+let print_method_name_map mnp =
+    print_string mnp.mnp_name;
+    print_string " -> ";
+    print_endline mnp.mnp_method_table_key
 
 let print_class_desc cd = 
     print_endline "";
@@ -134,7 +154,7 @@ let print_class_desc cd =
     print_endline "Attrbutes:";
     List.iter (fun el -> print_endline el) cd.attributes;
     print_endline "Methods:";
-    List.iter (fun el -> print_endline el) cd.method_names
+    List.iter (fun el -> print_method_name_map el) cd.method_names
 
 let print_class_desc_list cdl =
     print_endline "";
