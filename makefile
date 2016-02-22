@@ -9,4 +9,3 @@ byte:
 native:
 	ocamlbuild Main.clean
 
-
