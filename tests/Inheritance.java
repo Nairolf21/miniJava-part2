@@ -2,6 +2,7 @@
  *
  * Expected method table:
  *
+ *  - Object_toString
  *  - Animal_walk
  *  - Animal_run
  *  - Cat_run
@@ -19,10 +20,11 @@
 /* Expected class descriptor: 
  *
  * Expected method table names:
- *  - walk -> Animal_walk
- *  - run  -> Cat_run
- *  - meow -> Cat_meow
- *  - die  -> Cat_die
+ *  - toString -> Object_toString
+ *  - walk     -> Animal_walk
+ *  - run      -> Cat_run
+ *  - meow     -> Cat_meow
+ *  - die      -> Cat_die
  *
  * Exprected attribute list:
  *  - legNumber
@@ -48,8 +50,9 @@ public class Cat extends Animal {
 /* Expected class descriptor:
  *
  * Expected method table names:
- *  - walk -> Animal_walk
- *  - run  -> Animal_run
+ *  - toString -> Object_toString
+ *  - walk     -> Animal_walk
+ *  - run      -> Animal_run
  *
  * Exprected attribute list:
  *  - legNumber
