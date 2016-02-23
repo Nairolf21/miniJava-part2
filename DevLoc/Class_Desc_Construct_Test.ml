@@ -20,16 +20,17 @@ let construct_meth_table_key method_name parent_mmap child_id child_mlist =
     else StringMap.find method_name parent_mmap;;
 
 
-(*Construct method map of the child class descriptor based on the parent class descriptor and the child method name list*)
-let add_methods_to_child_desc parent_mmap child_mlist parent_id child_id =
-    let rec add_child_methods_rec child_mlist child_mmap =
-        match child_mlist with
-        | [] -> child_mmap
-        | h :: t -> add_child_methods_rec t (StringMap.add h (full_mname h child_id) child_mmap)
-    in
+let rec add_child_methods_to_mmap child_mlist child_mmap child_id (*Add method table as argument*)=
+    match child_mlist with
+    | [] -> child_mmap
+    | h :: t -> add_child_methods_rec t (StringMap.add h (full_mname h child_id) child_mmap) child_id
+
+(*Construct method map of the child class descriptor, adding only methods inherited but not redefined by the child.
+ * Returns too elements: (string list) * (string StringMap.t) => (child_redefined_method_list, parent_method_mmap)*)
+let add_parent_methods_to_mmap parent_mmap child_mlist parent_id child_id =
     let rec add_parent_methods_rec parent_mlist child_mlist child_mmap =
         match parent_mlist with
-        | [] -> add_child_methods_rec child_mlist child_mmap
+        | [] -> (child_mlist, child_mmap)
         | h :: t -> 
                 let new_child_list = ListII.remove h child_mlist in
                 let method_table_key = construct_meth_table_key h parent_mmap child_id child_mlist in
@@ -54,6 +55,11 @@ print_endline "";;
 print_endline "animal_mmap";;
 sm_list_keys animal_mmap;;
 print_endline "";;
-let cat_mmap = add_methods_to_child_desc animal_mmap cat_mlist "Animal" "Cat";;
-print_endline "cat_mmap after adding parent methods";;
+let (redefined_mlist, inherited_cat_mmap) = add_parent_methods_to_mmap animal_mmap cat_mlist "Animal" "Cat";;
+print_endline "inherited_cat_mmap after adding parent methods";;
+StringMap.iter print_el inherited_cat_mmap;;
+print_endline "";;
+let cat_mmap = add_child_methods_to_mmap redefined_mlist inherited_cat_mmap "Cat";;
+print_endline "full cat_mmap";;
 StringMap.iter print_el cat_mmap;;
+
