@@ -49,10 +49,10 @@ and is_astclass_compiled id_class mem =
 
 and add_astclass_to_memory astclass id_class id_parent mem =
     let parent_class_desc = find_class_desc_by_ref id_parent mem.class_desc_list in
-    let rec add_parent_methods parent_method_list child_astmethod_names child_class_desc method_table =
-        match parent_method_list with
-        | [] -> mem
-        | h :: t -> 
+    let rec add_parent_methods parent_method_map child_astmethod_names child_class_desc method_table =
+        List.map (sm_list_keys parent_method_map)
+
+
 
     
     (*

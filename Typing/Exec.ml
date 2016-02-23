@@ -1,11 +1,16 @@
 open AST
 open Type
 
-type method_name_map = { mnp_name : string; mnp_method_table_key : string }
+module StringMap = Map.Make(String)
 
-let mnp_name_eq a b =
-    if a.mnp_name = b.mnp_name then true
-    else false
+let sm_list_keys map =
+    let rec list_keys_rec assoc_list key_list =
+        match assoc_list with
+        | [] -> []
+        | [(k, _)] -> key_list @ [k]
+        | (k, _) :: t -> key_list @ (list_keys_rec t [k]) 
+    in
+    list_keys_rec (StringMap.bindings map) [];;
 
 (* TODO: Be more specific with the attributes : add modifiers and type ?
  * Or is it to be made by the typing team ?*)
@@ -13,7 +18,7 @@ type class_desc =
     {
         name : string;
         attributes : string list;
-        method_names : method_name_map list
+        method_names : string StringMap.t
     }
 
 let object_class_desc =
@@ -143,10 +148,10 @@ let compile_classes ast =
 
 (*Printing functions *)
 
-let print_method_name_map mnp =
-    print_string mnp.mnp_name;
+let print_method_name_map m_name mt_name =
+    print_string m_name;
     print_string " -> ";
-    print_endline mnp.mnp_method_table_key
+    print_endline mt_name
 
 let print_class_desc cd = 
     print_endline "";
@@ -154,7 +159,7 @@ let print_class_desc cd =
     print_endline "Attrbutes:";
     List.iter (fun el -> print_endline el) cd.attributes;
     print_endline "Methods:";
-    List.iter (fun el -> print_method_name_map el) cd.method_names
+    StringMap.iter print_method_name_map cd.method_names
 
 let print_class_desc_list cdl =
     print_endline "";
