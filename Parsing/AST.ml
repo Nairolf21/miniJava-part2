@@ -1,3 +1,5 @@
+open Type
+
 type argument = {
     final : bool;
     vararg : bool;
@@ -180,13 +182,30 @@ type t = {
     type_list : asttype list;
   }
 
-
+(*Utility functions*)
 let method_name_list_of_astclass astclass =
     List.map (fun el -> el.mname) astclass.cmethods 
 
 let attribute_name_list_of_astclass astclass =
     List.map (fun el -> el.aname) astclass.cattributes
 
+let rec find_asttype_by_ref type_list ref =
+    match type_list with
+    | h :: t -> if h.id = ref.tid then Some h 
+                else find_asttype_by_ref t ref
+    | [] -> None
+
+let find_astmethod_by_name name astclass =
+    let rec find_astmethod_rec name mlist =
+        match mlist with
+        | [] -> Pervasives.failwith "Astmethod not found"
+        | h :: t -> if name = h.mname then h
+                    else find_astmethod_rec name t
+    in
+    find_astmethod_rec name astclass.cmethods
+
+
+(* Printing functions *)
 let string_of_value = function
   | String s -> "\""^s^"\""
   | Boolean b -> string_of_bool b
