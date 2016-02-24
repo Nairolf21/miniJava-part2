@@ -10,7 +10,7 @@ and init_memory =
     (* Add class Object to memory *)
     {
         class_desc_list = [object_class_desc];
-        meth_table = [] (* For the moment, the mapping is done with an astmethod, which cannot be done for Object *)
+        meth_table = StringMap.empty (* For the moment, the mapping is done with an astmethod, which cannot be done for Object *)
     }
 
 and compile_classes type_list mem = 
@@ -51,14 +51,14 @@ and add_astclass_to_memory astclass class_id parent_id mem =
     let parent_class_desc = find_class_desc_by_ref parent_id mem.class_desc_list in
     let parent_mmap = parent_class_desc.method_names in
     let child_mlist = method_name_list_of_astclass astclass in
-    let (redefined_mlist, inherited_mmap) = add_parent_methods_to_mmap parent_mmap child_mlist child parent_id class_id in
+    let (redefined_mlist, inherited_mmap) = add_parent_methods_to_mmap parent_mmap child_mlist parent_id class_id in
     let (child_mmap, updated_meth_table) = add_child_methods_to_mmap redefined_mlist inherited_mmap class_id astclass mem.meth_table in 
 
     let child_class_desc = create_child_class_desc parent_class_desc class_id (attribute_name_list_of_astclass astclass) child_mmap in
 
     {
         meth_table = updated_meth_table;
-        class_desc_list = mem.class_desc_list @ child_class_desc
+        class_desc_list = mem.class_desc_list @ [child_class_desc]
     
     }
 
@@ -66,11 +66,11 @@ and add_child_methods_to_mmap child_mlist child_mmap child_id child_astclass met
     match child_mlist with
     | [] -> child_mmap, meth_table
     | h :: t -> 
-            let meth_table_key = full_manem h child_id in
-            let astmethod = find_astmethod_by_name h in
+            let meth_table_key = full_mname h child_id in
+            let astmethod = find_astmethod_by_name h child_astclass in
             let updated_meth_table = StringMap.add meth_table_key astmethod meth_table in
             
-            add_child_methods_rec t (StringMap.add h meth_table_key child_mmap) child_id child_astclass updated_meth_table
+            add_child_methods_to_mmap t (StringMap.add h meth_table_key child_mmap) child_id child_astclass updated_meth_table
 
 (*Construct method map of the child class descriptor, adding only methods inherited but not redefined by the child.
  * Returns too elements: (string list) * (string StringMap.t) => (child_redefined_method_list, parent_method_mmap)*)
@@ -86,18 +86,13 @@ and add_parent_methods_to_mmap parent_mmap child_mlist parent_id child_id =
     in
     add_parent_methods_rec (sm_list_keys parent_mmap) child_mlist StringMap.empty
 
-
-and method_entry_list_from_astclass astclass class_id =
-    let rec map_rec method_list class_id =
-        match method_list with 
-        | [] -> []
-        | h :: t -> [create_meth_table_entry class_id h] @ map_rec t class_id
-    in
-    map_rec astclass.cmethods class_id
+and  construct_meth_table_key method_name parent_mmap child_id child_mlist =
+    if ListII.is_in_list method_name child_mlist then full_mname method_name child_id 
+    else StringMap.find method_name parent_mmap
 
 and find_class_desc_by_ref class_id class_desc_list =
     match class_desc_list with
-    | [] -> None
-    | h :: t -> if h.name = class_id then Some h
+    | [] -> Pervasives.failwith "find_class_desc_by_ref: class_desc not found"
+    | h :: t -> if h.name = class_id then h
                 else find_class_desc_by_ref class_id t
 
