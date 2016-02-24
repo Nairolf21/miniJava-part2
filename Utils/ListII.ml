@@ -12,3 +12,18 @@ let extract_last l =
     | [a] -> a, list
     | h::t -> extract_last_rec (list@[h]) t
   in extract_last_rec [] l
+
+
+let rec remove el l =
+    match l with
+    | [] -> []
+    | h :: t -> if h = el then t
+                else h :: (remove el t)
+
+let rec is_in_list el l =
+    match l with 
+    | [] -> false
+    | h :: t -> if h = el then true
+                else is_in_list el t
+
+
