@@ -1,4 +1,3 @@
-open ListII
 
 module StringMap = Map.Make(String)
 
@@ -9,10 +8,10 @@ let sm_list_keys map =
         | [(k, _)] -> key_list @ [k]
         | (k, _) :: t -> key_list @ (list_keys_rec t [k]) 
     in
-    list_keys_rec (StringMap.bindings map) [];;
+    list_keys_rec (StringMap.bindings map) []
 
 let print_el k v =
-    print_endline (k^" -> "^v);;
+    print_endline (k^" -> "^v)
 
 let full_mname mname classname = classname ^ "_" ^ mname
 
