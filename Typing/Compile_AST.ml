@@ -1,6 +1,6 @@
-open Exec
 open AST
 open Pervasives
+open Memory_Model
 
 (* AST.t -> memory *)
 let rec compile_ast ast =
@@ -23,12 +23,12 @@ and compile_asttype type_list asttype mem =
     | Inter -> mem
     | Class c -> compile_class type_list c asttype.id mem
 
-and compile_class type_list astclass id_class mem =
-    if is_astclass_compiled id_class mem then mem
+and compile_class type_list astclass class_id mem =
+    if is_astclass_compiled class_id mem then mem
     else 
         begin
             let parent_asttype = find_asttype_by_ref type_list astclass.cparent in
-            add_astclass_to_memory astclass id_class astclass.cparent.tid (mem_with_parent type_list parent_asttype astclass.cparent.tid mem)
+            add_astclass_to_memory astclass class_id astclass.cparent.tid (mem_with_parent type_list parent_asttype astclass.cparent.tid mem)
         end
 
 and mem_with_parent type_list parent_asttype parent_id mem =
@@ -37,56 +37,67 @@ and mem_with_parent type_list parent_asttype parent_id mem =
               else failwith (parent_id^"not found in the AST")
     | Some parent_asttype -> compile_asttype type_list parent_asttype mem
 
-and is_astclass_compiled id_class mem =
-    let rec is_astclass_compiled_rec id_class class_desc_list =
+and is_astclass_compiled class_id mem =
+    let rec is_astclass_compiled_rec class_id class_desc_list =
     match class_desc_list with 
     | [] -> false
-    | h :: t -> if h.name = id_class then true
-                else is_astclass_compiled_rec id_class t
+    | h :: t -> if h.name = class_id then true
+                else is_astclass_compiled_rec class_id t
     in
-    is_astclass_compiled_rec id_class mem.class_desc_list
+    is_astclass_compiled_rec class_id mem.class_desc_list
     
 
-and add_astclass_to_memory astclass id_class id_parent mem =
-    let parent_class_desc = find_class_desc_by_ref id_parent mem.class_desc_list in
-    let rec add_parent_methods parent_method_map child_astmethod_names child_class_desc method_table =
-        List.map (sm_list_keys parent_method_map)
+and add_astclass_to_memory astclass class_id parent_id mem =
+    let parent_class_desc = find_class_desc_by_ref parent_id mem.class_desc_list in
+    let parent_mmap = parent_class_desc.method_names in
+    let child_mlist = method_name_list_of_astclass astclass in
+    let (redefined_mlist, inherited_mmap) = add_parent_methods_to_mmap parent_mmap child_mlist child parent_id class_id in
+    let (child_mmap, updated_meth_table) = add_child_methods_to_mmap redefined_mlist inherited_mmap class_id astclass mem.meth_table in 
 
+    let child_class_desc = create_child_class_desc parent_class_desc class_id (attribute_name_list_of_astclass astclass) child_mmap in
 
-
+    {
+        meth_table = updated_meth_table;
+        class_desc_list = mem.class_desc_list @ child_class_desc
     
-    (*
-            let parent_class_desc = find_class_desc_by_ref id_parent mem.class_desc_list in
-            match parent_class_desc with
-            | None -> mem
-            | Some parent_class_desc ->
-            let child_class_desc = create_class_desc_with_parent astclass id_class parent_class_desc in
-{
-    class_desc_list = mem.class_desc_list @ [child_class_desc];
-    meth_table = mem.meth_table @ (method_entry_list_from_astclass astclass id_class)
-
-}
-
-and create_class_desc_with_parent astclass id parent_class_desc =
-    let namelist = List.map (fun attr -> attr.aname) astclass.cattributes in
-    let methodlist= List.map (fun meth -> meth.mname) astclass.cmethods in
-    { 
-        name = id; 
-        attributes = parent_class_desc.attributes @ namelist; 
-        method_names = parent_class_desc.method_names @ methodlist 
     }
-*)
-and method_entry_list_from_astclass astclass id_class =
-    let rec map_rec method_list id_class =
+
+and add_child_methods_to_mmap child_mlist child_mmap child_id child_astclass meth_table =
+    match child_mlist with
+    | [] -> child_mmap, meth_table
+    | h :: t -> 
+            let meth_table_key = full_manem h child_id in
+            let astmethod = find_astmethod_by_name h in
+            let updated_meth_table = StringMap.add meth_table_key astmethod meth_table in
+            
+            add_child_methods_rec t (StringMap.add h meth_table_key child_mmap) child_id child_astclass updated_meth_table
+
+(*Construct method map of the child class descriptor, adding only methods inherited but not redefined by the child.
+ * Returns too elements: (string list) * (string StringMap.t) => (child_redefined_method_list, parent_method_mmap)*)
+and add_parent_methods_to_mmap parent_mmap child_mlist parent_id child_id =
+    let rec add_parent_methods_rec parent_mlist child_mlist child_mmap =
+        match parent_mlist with
+        | [] -> (child_mlist, child_mmap)
+        | h :: t -> 
+                let new_child_list = ListII.remove h child_mlist in
+                let method_table_key = construct_meth_table_key h parent_mmap child_id child_mlist in
+                let updated_child_mmap = StringMap.add h method_table_key child_mmap in
+                add_parent_methods_rec t new_child_list updated_child_mmap 
+    in
+    add_parent_methods_rec (sm_list_keys parent_mmap) child_mlist StringMap.empty
+
+
+and method_entry_list_from_astclass astclass class_id =
+    let rec map_rec method_list class_id =
         match method_list with 
         | [] -> []
-        | h :: t -> [create_meth_table_entry id_class h] @ map_rec t id_class
+        | h :: t -> [create_meth_table_entry class_id h] @ map_rec t class_id
     in
-    map_rec astclass.cmethods id_class
+    map_rec astclass.cmethods class_id
 
-and find_class_desc_by_ref id_class class_desc_list =
+and find_class_desc_by_ref class_id class_desc_list =
     match class_desc_list with
     | [] -> None
-    | h :: t -> if h.name = id_class then Some h
-                else find_class_desc_by_ref id_class t
+    | h :: t -> if h.name = class_id then Some h
+                else find_class_desc_by_ref class_id t
 

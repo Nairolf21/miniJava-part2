@@ -180,7 +180,11 @@ type t = {
   }
 
 
+let method_name_list_of_astclass astclass =
+    List.map (fun el -> el.mname) astclass.cmethods 
 
+let attribute_name_list_of_astclass astclass =
+    List.map (fun el -> el.aname) astclass.cattributes
 
 let string_of_value = function
   | String s -> "\""^s^"\""
