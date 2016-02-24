@@ -24,3 +24,4 @@ let rec remove el l =
     | [] -> []
     | h :: t -> if h = el then t
                 else h :: (remove el t)
+
