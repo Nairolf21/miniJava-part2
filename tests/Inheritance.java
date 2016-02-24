@@ -37,9 +37,13 @@ public class Cat extends Animal {
     /* livesLeft should be between 0 and 9 */
     private int livesLeft;
 
-	public void run() {}
+	public void run() {
+		String cat_run;
+	}
 
-    public void meow() {}
+    public void meow() {
+		String cat_meow;
+	}
 
     public void die() {
         livesLeft--;
@@ -63,7 +67,11 @@ public class Animal {
     private int legNumber;
     private String name;
 
-    public void walk() {}
-	public void run() {}
+    public void walk() {
+		String animal_walk;
+	}
+	public void run() {
+		String animal_run;
+	}
 
 }

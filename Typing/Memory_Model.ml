@@ -1,3 +1,6 @@
+(* This module defines the structures used for the memory management.
+ * class_desc : Used to describe a class, with information extended from its parent. *)
+
 open AST
 
 module StringMap = Map.Make(String)
@@ -20,7 +23,7 @@ let add_method_to_mmap class_id method_name mmap =
 type class_desc = 
     {
         name : string;
-        attributes : string list; (*change to an ordered list of cattributes to be able to take type, modifiers etc...*)
+        attributes : (string * AST.astattribute) list; (*change to an ordered list of cattributes to be able to take type, modifiers etc...*)
         method_names : string StringMap.t
     }
 
@@ -66,8 +69,10 @@ let add_method_to_meth_table method_key astmethod meth_table =
 let print_ss_el k v =
     print_endline (k^" -> "^v)
 
-let print_meth_table_line k v =
-    print_endline (k^" -> "^v.mname)
+let print_meth_table_line name astmethod =
+    print_string (name^" -> ");
+    print_method "" astmethod;
+    print_endline ""
 
 let print_method_table meth_table =
     print_endline "Method table (comp_name: ast_name)";
@@ -75,15 +80,29 @@ let print_method_table meth_table =
     StringMap.iter print_meth_table_line meth_table;
     print_endline ""
 
+
 let print_method_name_map mmap =
     StringMap.iter print_ss_el mmap
 
+let print_attribute_name el =
+    match el with
+    | (name, _) -> print_endline name
+    | _ -> ()
+
+let print_attribute_map el =
+    match el with
+    | (name, astattribute) ->
+        print_string name;
+        print_string " -> ";
+        print_attribute "" astattribute;
+        print_endline ""
+    | _ -> ()
 
 let print_class_desc cd = 
     print_endline "";
     print_endline ("name: "^cd.name);
     print_endline "Attrbutes:";
-    List.iter (fun el -> print_endline el) cd.attributes;
+    List.iter print_attribute_map cd.attributes;
     print_endline "Methods:";
     print_method_name_map cd.method_names
 
