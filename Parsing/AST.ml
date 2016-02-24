@@ -189,6 +189,9 @@ let method_name_list_of_astclass astclass =
 let attribute_name_list_of_astclass astclass =
     List.map (fun el -> el.aname) astclass.cattributes
 
+let attribute_list_of_astclass astclass =
+    List.map (fun el -> (el.aname, el)) astclass.cattributes
+
 let rec find_asttype_by_ref type_list ref =
     match type_list with
     | h :: t -> if h.id = ref.tid then Some h 

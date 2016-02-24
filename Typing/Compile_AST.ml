@@ -54,7 +54,7 @@ and add_astclass_to_memory astclass class_id parent_id mem =
     let (redefined_mlist, inherited_mmap) = add_parent_methods_to_mmap parent_mmap child_mlist parent_id class_id in
     let (child_mmap, updated_meth_table) = add_child_methods_to_mmap redefined_mlist inherited_mmap class_id astclass mem.meth_table in 
 
-    let child_class_desc = create_child_class_desc parent_class_desc class_id (attribute_name_list_of_astclass astclass) child_mmap in
+    let child_class_desc = create_child_class_desc parent_class_desc class_id (attribute_list_of_astclass astclass) child_mmap in
 
     {
         meth_table = updated_meth_table;
