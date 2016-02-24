@@ -1,3 +1,4 @@
+open AST
 
 module StringMap = Map.Make(String)
 
@@ -10,8 +11,6 @@ let sm_list_keys map =
     in
     list_keys_rec (StringMap.bindings map) []
 
-let print_el k v =
-    print_endline (k^" -> "^v)
 
 let full_mname mname classname = classname ^ "_" ^ mname
 
@@ -61,10 +60,24 @@ let add_method_to_meth_table method_key astmethod meth_table =
 
 (*Printing functions *)
 
-let print_method_name_map m_name mt_name =
-    print_string m_name;
-    print_string " -> ";
-    print_endline mt_name
+(*StringMap print functions*)
+
+(* Print element for string StringMap.t*)
+let print_ss_el k v =
+    print_endline (k^" -> "^v)
+
+let print_meth_table_line k v =
+    print_endline (k^" -> "^v.mname)
+
+let print_method_table meth_table =
+    print_endline "Method table (comp_name: ast_name)";
+    print_endline "";
+    StringMap.iter print_meth_table_line meth_table;
+    print_endline ""
+
+let print_method_name_map mmap =
+    StringMap.iter print_ss_el mmap
+
 
 let print_class_desc cd = 
     print_endline "";
@@ -72,25 +85,13 @@ let print_class_desc cd =
     print_endline "Attrbutes:";
     List.iter (fun el -> print_endline el) cd.attributes;
     print_endline "Methods:";
-    StringMap.iter print_method_name_map cd.method_names
+    print_method_name_map cd.method_names
 
 let print_class_desc_list cdl =
     print_endline "";
     print_endline "Class descriptors";
     print_endline "";
     List.iter (function el -> print_class_desc el) cdl;
-    print_endline ""
-
-let print_method_table_entry entry =
-    print_string entry.comp_name;
-    print_string ": ";
-    print_string entry.meth.mname;
-    print_endline ""
-
-let print_method_table meth_table =
-    print_endline "Method table (comp_name: ast_name)";
-    print_endline "";
-    List.iter (function el -> print_method_table_entry el) meth_table;
     print_endline ""
 
 let print_memory mem = 
