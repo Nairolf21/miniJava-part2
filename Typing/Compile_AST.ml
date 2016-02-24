@@ -63,6 +63,11 @@ and add_astclass_to_memory astclass class_id parent_id mem =
     }
 
 and add_child_methods_to_mmap child_mlist child_mmap child_id child_astclass meth_table =
+    print_endline ("add_child_methods for class "^child_id);
+    print_string "child_mlist: ";
+    List.iter (fun el -> print_string (el^";")) child_mlist;
+    print_endline "";
+    print_endline "";
     match child_mlist with
     | [] -> child_mmap, meth_table
     | h :: t -> 
@@ -79,6 +84,8 @@ and add_parent_methods_to_mmap parent_mmap child_mlist parent_id child_id =
         match parent_mlist with
         | [] -> (child_mlist, child_mmap)
         | h :: t -> 
+                if ListII.is_in_list h child_mlist then add_parent_methods_rec t child_mlist child_mmap
+                else
                 let new_child_list = ListII.remove h child_mlist in
                 let method_table_key = construct_meth_table_key h parent_mmap child_id child_mlist in
                 let updated_child_mmap = StringMap.add h method_table_key child_mmap in
