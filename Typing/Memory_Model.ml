@@ -79,6 +79,15 @@ type memory = {
     heap : obj_desc list
 }
 
+let rec find_class_desc_by_name class_id mem =
+    let rec find_class_desc_by_name_rec class_id class_desc_list =
+        match class_desc_list with
+        | [] -> Pervasives.failwith ("find_class_desc_by_name: class_desc not found for class_id = "^class_id)
+        | h :: t -> if h.name = class_id then h
+                    else find_class_desc_by_name_rec class_id t
+    in
+    find_class_desc_by_name_rec class_id mem.class_desc_list
+
 let rec init_v_value name value_type init_value =
     match init_value with
     | None -> { v_name = name; v_value = empty_value value_type }
@@ -100,8 +109,10 @@ and empty_array_value array_type length = VArray None (* I don't know yet if it'
 
 and empty_ref_type r_type = VRefType None
 
+let rec new_object class_id ob_name mem =
+    new_object_from_class_desc (find_class_desc_by_name class_id mem) ob_name mem
 
-let rec new_object class_desc ob_name mem =
+and  new_object_from_class_desc class_desc ob_name mem =
     let new_obj = {
         class_id = class_desc.name;
         ob_id = ob_name;
@@ -120,6 +131,7 @@ and add_to_heap obj_desc mem =
         meth_table = mem.meth_table;
         heap = mem.heap @ [obj_desc]
     }
+
 
 
 let add_method_to_meth_table method_key astmethod meth_table =
@@ -178,12 +190,54 @@ let print_class_desc_list cdl =
     List.iter (function el -> print_class_desc el) cdl;
     print_endline ""
 
+let rec string_of_value = function
+   | VBoolean None -> "Undefined VBoolean"
+   | VChar None -> "Undefined VChar"
+   | VInt None -> "Undefined VInt"
+   | VFloat None -> "Undefined VFloat"
+   | VRefType None -> "Undefined VRefType"
+   | VArray None -> "Undefined VArray"
+   | VBoolean Some b -> string_of_bool b
+   | VChar Some c -> Char.escaped c
+   | VInt Some i -> string_of_int i
+   | VFloat Some f -> string_of_float f
+   | VRefType Some rt -> string_of_vreftype rt
+   | VArray Some va -> string_of_varray va
+
+
+and string_of_vreftype obj_desc =
+    ("Object desc "^obj_desc.ob_id^" of class "^obj_desc.class_id)
+
+and string_of_varray va =
+    let rec string_of_varray_rec va str =
+        match va with
+        | [] -> str
+        | h :: t -> string_of_varray_rec t (str^"; "^(string_of_value h))
+    in
+    string_of_varray_rec va ""
+
+    
+let print_v_value v_value =
+    print_endline (v_value.v_name^" -> "^(string_of_value v_value.v_value))
+
+let print_obj_desc obj_desc =
+    print_endline ("Object desc "^obj_desc.ob_id^" of class "^obj_desc.class_id);
+    print_endline "Attribute values";
+    List.iter print_v_value obj_desc.ob_attributes
+
+let print_heap mem =
+    print_endline "Heap:";
+    List.iter print_obj_desc mem.heap
+
+
 let print_memory mem = 
     print_endline "";
     print_endline "Printing memory representation";
     print_endline "";
     print_method_table mem.meth_table;
     print_class_desc_list mem.class_desc_list;
+    print_endline "";
+    print_heap mem;
     print_endline "";
     print_endline "End of memory representation";
     print_endline ""
