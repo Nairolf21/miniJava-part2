@@ -10,6 +10,7 @@ let execute lexbuf verbose =
     print_endline "successfull typing";
 
 
+
   with 
     | Error ->
       print_string "Syntax error: ";
