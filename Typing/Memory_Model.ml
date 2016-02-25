@@ -15,13 +15,6 @@ let sm_list_keys map =
     in
     list_keys_rec (StringMap.bindings map) []
 
-let sm_value_list map =
-    let rec value_list_rec assoclist =
-    match assoclist with
-        | [] -> []
-        | (k, v) :: t -> v :: (value_list_rec t)
-    in
-    value_list_rec (StringMap.bindings map)
 
 let full_mname mname classname = classname ^ "_" ^ mname
 
@@ -79,22 +72,6 @@ and obj_desc =
         ob_attributes : v_value list
     }
 
-type memory = {
-    class_desc_list : class_desc list;
-    meth_table : AST.astmethod StringMap.t;
-    
-    heap : obj_desc list
-}
-
-let rec find_class_desc_by_name class_id mem =
-    let rec find_class_desc_by_name_rec class_id class_desc_list =
-        match class_desc_list with
-        | [] -> Pervasives.failwith ("find_class_desc_by_name: class_desc not found for class_id = "^class_id)
-        | h :: t -> if h.name = class_id then h
-                    else find_class_desc_by_name_rec class_id t
-    in
-    find_class_desc_by_name_rec class_id mem.class_desc_list
-
 let rec init_v_value name value_type init_value =
     match init_value with
     | None -> { v_name = name; v_value = empty_value value_type }
@@ -112,14 +89,12 @@ and empty_primitive_value = function
     | Byte | Short | Int | Long -> VInt None
     | Long | Float -> VFloat None
 
-and empty_array_value array_type length = VArray None (* I don't know yet if it's enough to init as an empty array *)
+and empty_array_value array_type length = [] (* I don't know yet if it's enough to init as an empty array *)
 
 and empty_ref_type r_type = VRefType None
 
-let rec new_object class_id ob_name mem =
-    new_object_from_class_desc (find_class_desc_by_name class_id mem) ob_name mem
 
-and  new_object_from_class_desc class_desc ob_name mem =
+let rec new_object class_desc ob_name mem =
     let new_obj = {
         class_id = class_desc.name;
         ob_id = ob_name;
@@ -130,56 +105,21 @@ and  new_object_from_class_desc class_desc ob_name mem =
 and create_attribute_value_list cd_attribute_list attribute_value_list =
     match cd_attribute_list with
     | [] -> attribute_value_list
-    | (n, astattribute) :: t -> create_attribute_value_list t (attribute_value_list @ [(init_v_value n astattribute.atype None)])
+    | (n, astattribute) :: t -> create_attribute_value_list t (attribute_value_list @ [(init_v_value n astattribute.atype)])
 
 and add_to_heap obj_desc mem =
     {
         class_desc_list = mem.class_desc_list;
         meth_table = mem.meth_table;
-        heap = add_or_replace_in_heap obj_desc mem
+        heap = mem.heap @ [obj_desc]
     }
 
-and add_or_replace_in_heap obj_desc mem =
-    let rec add_or_replace_rec ob_id input_heap output_heap exists =
-        match input_heap with 
-        | [] -> if exists = true then output_heap else output_heap @ [obj_desc]
-        | h :: t -> if h.ob_id = ob_id then add_or_replace_rec ob_id t (output_heap @ [obj_desc]) true
-                    else add_or_replace_rec ob_id t (output_heap @ [h]) exists
-    in
-    add_or_replace_rec obj_desc.ob_id mem.heap [] false
-
-
-(*Returns the memory with updated value in the corresponding object descriptor*)
-let rec set_attribute_value_obj_id ob_id a_name a_value mem =
-    let obj_desc = find_obj_desc ob_id mem in
-    let updated_obj_desc = set_attribute_value obj_desc a_name a_value in
-    add_to_heap updated_obj_desc mem
-
-and set_attribute_value obj_desc a_name a_value =
-    {
-        class_id = obj_desc.class_id;
-        ob_id = obj_desc.ob_id;
-        ob_attributes = set_value obj_desc.ob_attributes a_name a_value
-    }
-
-and set_value v_value_list name value =
-    let rec insert_value il ol =
-        match v_value_list with 
-        | [] -> ol
-        | h :: t -> let el = if h.v_name = name then { v_name = name; v_value = value }
-                             else h
-                    in insert_value t (ol @ [h])
-    in
-    insert_value v_value_list []
-
-and find_obj_desc ob_id mem =
-    let rec find_obj_desc_rec heap =
-        match heap with
-        | [] -> Pervasives.failwith ("Could not find object "^ob_id^" in heap")
-        | h :: t -> if h.ob_id = ob_id then h 
-                    else find_obj_desc_rec t
-    in
-    find_obj_desc_rec mem.heap
+type memory = {
+    class_desc_list : class_desc list;
+    meth_table : AST.astmethod StringMap.t;
+    
+    heap : obj_desc list
+}
 
 let add_method_to_meth_table method_key astmethod meth_table =
     StringMap.add method_key astmethod meth_table
@@ -237,54 +177,12 @@ let print_class_desc_list cdl =
     List.iter (function el -> print_class_desc el) cdl;
     print_endline ""
 
-let rec string_of_value = function
-   | VBoolean None -> "Undefined VBoolean"
-   | VChar None -> "Undefined VChar"
-   | VInt None -> "Undefined VInt"
-   | VFloat None -> "Undefined VFloat"
-   | VRefType None -> "Undefined VRefType"
-   | VArray None -> "Undefined VArray"
-   | VBoolean Some b -> string_of_bool b
-   | VChar Some c -> Char.escaped c
-   | VInt Some i -> string_of_int i
-   | VFloat Some f -> string_of_float f
-   | VRefType Some rt -> string_of_vreftype rt
-   | VArray Some va -> string_of_varray va
-
-
-and string_of_vreftype obj_desc =
-    ("Object desc "^obj_desc.ob_id^" of class "^obj_desc.class_id)
-
-and string_of_varray va =
-    let rec string_of_varray_rec va str =
-        match va with
-        | [] -> str
-        | h :: t -> string_of_varray_rec t (str^"; "^(string_of_value h))
-    in
-    string_of_varray_rec va ""
-
-    
-let print_v_value v_value =
-    print_endline (v_value.v_name^" -> "^(string_of_value v_value.v_value))
-
-let print_obj_desc obj_desc =
-    print_endline ("Object desc "^obj_desc.ob_id^" of class "^obj_desc.class_id);
-    print_endline "Attribute values";
-    List.iter print_v_value obj_desc.ob_attributes
-
-let print_heap mem =
-    print_endline "Heap:";
-    List.iter print_obj_desc mem.heap
-
-
 let print_memory mem = 
     print_endline "";
     print_endline "Printing memory representation";
     print_endline "";
     print_method_table mem.meth_table;
     print_class_desc_list mem.class_desc_list;
-    print_endline "";
-    print_heap mem;
     print_endline "";
     print_endline "End of memory representation";
     print_endline ""
