@@ -3,9 +3,8 @@ open Type
 
 
 
-(* Typing functions *)
 
-
+(* 1st pass : detection of class declarations, add them to env *)
 let type_type_info exp env = 
 	match exp with
 	| Class c -> c :: env 
@@ -14,6 +13,7 @@ let type_type_info exp env =
 let type_asttype exp env =
 	match exp.info with
 	| info -> type_type_info exp.info env
+
 
 let rec type_program type_list env=
 	match type_list with
