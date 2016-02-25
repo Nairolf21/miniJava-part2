@@ -2,6 +2,7 @@
  * class_desc : Used to describe a class, with information extended from its parent. *)
 
 open AST
+open Type
 
 module StringMap = Map.Make(String)
 
@@ -51,10 +52,73 @@ and create_child_attribute_list parent_attributes child_attributes =
     | h :: t -> h :: create_child_attribute_list t (ListII.remove h child_attributes) 
 
 
+(* Values (instances, variable values, heap) *)
+type value =
+    | VBoolean of bool option
+    | VChar of char option
+    | VInt of int option
+    | VFloat of float option
+    | VRefType of obj_desc option
+    | VArray of (value list) option
+
+
+(* Variable value: can be used for attributes and for stack variables *)
+and v_value = { v_name : string; v_value : value }
+
+and obj_desc =
+    {
+        class_id : string;
+        ob_id : string;
+        ob_attributes : v_value list
+    }
+
+let rec init_v_value name value_type init_value =
+    match init_value with
+    | None -> { v_name = name; v_value = empty_value value_type }
+    | Some init_value -> Pervasives.failwith "init_v_value with with an init value is not yet defined"
+
+and empty_value = function
+    | Void -> Pervasives.failwith "Void is not a variable type"
+    | Array (array_type, length) -> empty_array_value array_type length
+    | Primitive p_type -> empty_primitive_value p_type
+    | Ref r_type -> empty_ref_type r_type
+
+and empty_primitive_value = function
+    | Boolean -> VBoolean None
+    | Char -> VChar None 
+    | Byte | Short | Int | Long -> VInt None
+    | Long | Float -> VFloat None
+
+and empty_array_value array_type length = [] (* I don't know yet if it's enough to init as an empty array *)
+
+and empty_ref_type r_type = VRefType None
+
+
+let rec new_object class_desc ob_name mem =
+    let new_obj = {
+        class_id = class_desc.name;
+        ob_id = ob_name;
+        ob_attributes = create_attribute_value_list class_desc.attributes []
+    } in
+    add_to_heap new_obj mem
+
+and create_attribute_value_list cd_attribute_list attribute_value_list =
+    match cd_attribute_list with
+    | [] -> attribute_value_list
+    | (n, astattribute) :: t -> create_attribute_value_list t (attribute_value_list @ [(init_v_value n astattribute.atype)])
+
+and add_to_heap obj_desc mem =
+    {
+        class_desc_list = mem.class_desc_list;
+        meth_table = mem.meth_table;
+        heap = mem.heap @ [obj_desc]
+    }
+
 type memory = {
     class_desc_list : class_desc list;
     meth_table : AST.astmethod StringMap.t;
     
+    heap : obj_desc list
 }
 
 let add_method_to_meth_table method_key astmethod meth_table =
