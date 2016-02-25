@@ -11,6 +11,12 @@ let execute lexbuf verbose =
     print_endline "********************* Successfull typing *********************";
     let memory = compile_ast ast in
     print_endline "********************* Successful class compilation *********************";
+
+    let memory = Memory_Model.new_object "Animal" "animal" memory in
+    let memory = Memory_Model.new_object "Cat" "mrtinkle" memory in
+    let memory = Memory_Model.new_object "Cat" "sirpounce" memory in
+
+
     Memory_Model.print_memory memory;
 
   with 
