@@ -129,10 +129,49 @@ and add_to_heap obj_desc mem =
     {
         class_desc_list = mem.class_desc_list;
         meth_table = mem.meth_table;
-        heap = mem.heap @ [obj_desc]
+        heap = add_or_replace_in_heap obj_desc mem
     }
 
+and add_or_replace_in_heap obj_desc mem =
+    let rec add_or_replace_rec ob_id input_heap output_heap exists =
+        match input_heap with 
+        | [] -> if exists = true then output_heap else output_heap @ [obj_desc]
+        | h :: t -> if h.ob_id = ob_id then add_or_replace_rec ob_id t (output_heap @ [obj_desc]) true
+                    else add_or_replace_rec ob_id t (output_heap @ [h]) exists
+    in
+    add_or_replace_rec obj_desc.ob_id mem.heap [] false
 
+(*Returns the memory with updated value in the corresponding object descriptor*)
+let rec set_attribute_value_obj_id ob_id a_name a_value mem =
+    let obj_desc = find_obj_desc ob_id mem in
+    let updated_obj_desc = set_attribute_value obj_desc a_name a_value in
+    add_to_heap updated_obj_desc mem
+
+and set_attribute_value obj_desc a_name a_value =
+    {
+        class_id = obj_desc.class_id;
+        ob_id = obj_desc.ob_id;
+        ob_attributes = set_value obj_desc.ob_attributes a_name a_value
+    }
+
+and set_value v_value_list name value =
+    let rec insert_value il ol =
+        match v_value_list with 
+        | [] -> ol
+        | h :: t -> let el = if h.v_name = name then { v_name = name; v_value = value }
+                             else h
+                    in insert_value t (ol @ [h])
+    in
+    insert_value v_value_list []
+
+and find_obj_desc ob_id mem =
+    let rec find_obj_desc_rec heap =
+        match heap with
+        | [] -> Pervasives.failwith ("Could not find object "^ob_id^" in heap")
+        | h :: t -> if h.ob_id = ob_id then h 
+                    else find_obj_desc_rec t
+    in
+    find_obj_desc_rec mem.heap
 
 let add_method_to_meth_table method_key astmethod meth_table =
     StringMap.add method_key astmethod meth_table
