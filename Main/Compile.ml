@@ -6,9 +6,8 @@ let execute lexbuf verbose =
     let ast = compilationUnit Lexer.token lexbuf in
     print_endline "successfull parsing";
     if verbose then AST.print_program ast ;
-    let type_AST = TypeAST.typing ast in
+    let type_AST = TypeAST.typing ast [] in
     print_endline "successfull typing";
-    if verbose then TypeAST.print_typing ast ;
 
 
   with 
