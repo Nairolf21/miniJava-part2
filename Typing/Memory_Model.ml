@@ -72,6 +72,13 @@ and obj_desc =
         ob_attributes : v_value list
     }
 
+type memory = {
+    class_desc_list : class_desc list;
+    meth_table : AST.astmethod StringMap.t;
+    
+    heap : obj_desc list
+}
+
 let rec init_v_value name value_type init_value =
     match init_value with
     | None -> { v_name = name; v_value = empty_value value_type }
@@ -89,7 +96,7 @@ and empty_primitive_value = function
     | Byte | Short | Int | Long -> VInt None
     | Long | Float -> VFloat None
 
-and empty_array_value array_type length = [] (* I don't know yet if it's enough to init as an empty array *)
+and empty_array_value array_type length = VArray None (* I don't know yet if it's enough to init as an empty array *)
 
 and empty_ref_type r_type = VRefType None
 
@@ -105,7 +112,7 @@ let rec new_object class_desc ob_name mem =
 and create_attribute_value_list cd_attribute_list attribute_value_list =
     match cd_attribute_list with
     | [] -> attribute_value_list
-    | (n, astattribute) :: t -> create_attribute_value_list t (attribute_value_list @ [(init_v_value n astattribute.atype)])
+    | (n, astattribute) :: t -> create_attribute_value_list t (attribute_value_list @ [(init_v_value n astattribute.atype None)])
 
 and add_to_heap obj_desc mem =
     {
@@ -114,12 +121,6 @@ and add_to_heap obj_desc mem =
         heap = mem.heap @ [obj_desc]
     }
 
-type memory = {
-    class_desc_list : class_desc list;
-    meth_table : AST.astmethod StringMap.t;
-    
-    heap : obj_desc list
-}
 
 let add_method_to_meth_table method_key astmethod meth_table =
     StringMap.add method_key astmethod meth_table
