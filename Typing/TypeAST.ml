@@ -11,7 +11,7 @@ let type_type_info exp env =
 	| Class c -> c @ env 
 	| Inter -> ()
 
-let type_astype exp env =
+let type_asttype exp env =
 	match exp.info with
 	| Some info -> type_type_info exp env
 	| None -> ()
