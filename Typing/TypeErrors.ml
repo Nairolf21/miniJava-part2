@@ -1,0 +1,1 @@
+exception Class_already_declared of string

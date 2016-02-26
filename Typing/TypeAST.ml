@@ -4,6 +4,14 @@ open Type
 
 
 
+(* Find if the class was already declared (ie added to env) *)
+let rec class_exists classname env =
+		match env with
+		[] -> false
+		| (id, c):: t -> if id=classname then true (* (id, c) *)
+							else class_exists classname t
+
+
 (* 1st pass : detection of class declarations, add them to env *)
 let type_type_info info id env = 
 	match info with
