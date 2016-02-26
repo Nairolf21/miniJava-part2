@@ -5,14 +5,14 @@ open Type
 
 
 (* 1st pass : detection of class declarations, add them to env *)
-let type_type_info exp env = 
-	match exp with
-	| Class c -> c :: env 
-	| Inter -> env
+let type_type_info info id env = 
+	match info with
+	| Class c -> (id, c) :: env
+	| Inter -> env (* We don't consider interfaces here *)
 
 let type_asttype exp env =
 	match exp.info with
-	| info -> type_type_info exp.info env
+	| info -> type_type_info exp.info exp.id env
 
 
 let rec type_program type_list env=
