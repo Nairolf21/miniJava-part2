@@ -19,11 +19,6 @@ let execute lexbuf verbose =
 
     Memory_Model.print_memory memory;
 
-
-    print_endline "";
-    print_endline "Eval program";
-    print_endline "";
-
     let memory = Eval.eval_program memory in
     if verbose then AST.print_program ast 
   with 

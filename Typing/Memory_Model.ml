@@ -15,6 +15,13 @@ let sm_list_keys map =
     in
     list_keys_rec (StringMap.bindings map) []
 
+let sm_value_list map =
+    let rec value_list_rec assoclist =
+    match assoclist with
+        | [] -> []
+        | (k, v) :: t -> v :: (value_list_rec t)
+    in
+    value_list_rec (StringMap.bindings map)
 
 let full_mname mname classname = classname ^ "_" ^ mname
 
@@ -140,6 +147,7 @@ and add_or_replace_in_heap obj_desc mem =
                     else add_or_replace_rec ob_id t (output_heap @ [h]) exists
     in
     add_or_replace_rec obj_desc.ob_id mem.heap [] false
+
 
 (*Returns the memory with updated value in the corresponding object descriptor*)
 let rec set_attribute_value_obj_id ob_id a_name a_value mem =
