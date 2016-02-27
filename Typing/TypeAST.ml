@@ -1,6 +1,6 @@
 open AST
 open Type
-
+open TypeErrors
 
 
 
@@ -15,7 +15,8 @@ let rec class_exists classname env =
 (* 1st pass : detection of class declarations, add them to env *)
 let type_type_info info id env = 
 	match info with
-	| Class c -> (id, c) :: env
+	| Class c ->  if not (class_exists id env) then (id, c) :: env
+					else raise (Class_already_declared(id))
 	| Inter -> env (* We don't consider interfaces here *)
 
 let type_asttype exp env =
@@ -25,7 +26,7 @@ let type_asttype exp env =
 
 let rec type_program type_list env=
 	match type_list with
-	| h::t -> type_asttype h env :: type_program t env
+	| h::t -> type_asttype h env :: type_program t (type_asttype h env)
 	| [] -> []
 
 let typing exp env =
