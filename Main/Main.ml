@@ -1,4 +1,4 @@
-let verbose = ref false
+let verbose = ref true
 
 let get_file str =
   let temp2 = Filename.check_suffix str ".java" in
