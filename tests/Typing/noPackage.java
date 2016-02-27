@@ -3,6 +3,4 @@ class A{
 	String s = 2;
 }
 
-class B{}
-class A{}
-
+class B extends C{}
