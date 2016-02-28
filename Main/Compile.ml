@@ -5,12 +5,12 @@ open Compile_AST
 let execute lexbuf verbose = 
   try 
     let ast = compilationUnit Lexer.token lexbuf in
-    print_endline "successfull parsing";
+    print_endline "********************* Successfull parsing *********************";
     if verbose then AST.print_program ast ;
     let type_AST = TypeAST.typing ast [] in
-    print_endline "successfull typing";
+    print_endline "********************* Successfull typing *********************";
     let memory = compile_ast ast in
-    print_endline "successful class compilation";
+    print_endline "********************* Successful class compilation *********************";
     Memory_Model.print_memory memory;
 
   with 

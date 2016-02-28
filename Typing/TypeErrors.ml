@@ -1,1 +1,2 @@
 exception Class_already_declared of string
+exception Parent_class_unknown of string
