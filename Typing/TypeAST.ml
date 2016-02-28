@@ -21,7 +21,7 @@ let rec cparent_in_cenv c cenv=
 (* Check heritage *)
 let rec check_cparent cenv=
 	match cenv with
-	| [] -> false
+	| [] -> true
 	| (id, c):: t -> if ((not (c.cparent.tid="Object")) && (not (cparent_in_cenv c cenv) )) then (raise (Parent_class_unknown(c.cparent.tid)))
 						else check_cparent t 
 
@@ -39,16 +39,11 @@ let type_asttype exp env = type_type_info exp.info exp.id env
 let rec class_env type_list env=
 	match type_list with
 	| [] -> []
-	| h::t -> type_asttype h env @ class_env t (type_asttype h env)
+	| h::t -> let nenv= type_asttype h env in 
+			nenv @ class_env t nenv
 
 
 let typing exp env = 
 	let classenv = class_env exp.type_list env in 
 		if (check_cparent classenv) then (print_endline "heritage ok");
 
-
-(* 	
-	let classenv = class_env exp.type_list env in
-		match exp.package with
-		| None -> classenv
-		| Some pack -> classenv *)
