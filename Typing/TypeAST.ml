@@ -39,7 +39,7 @@ let type_asttype exp env = type_type_info exp.info exp.id env
 let rec class_env type_list env=
 	match type_list with
 	| [] -> []
-	| h::t -> type_asttype h env :: class_env t (type_asttype h env)
+	| h::t -> type_asttype h env @ class_env t (type_asttype h env)
 
 
 let typing exp env = 
