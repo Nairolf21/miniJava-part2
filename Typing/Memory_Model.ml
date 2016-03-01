@@ -65,9 +65,10 @@ type value =
     | VChar of char option
     | VInt of int option
     | VFloat of float option
-    | VRefType of obj_desc option
+    | VRefType of vref_type option
     | VArray of (value list) option
 
+and vref_type = { vref_obj_id : string; vref_class_id : string }
 
 (* Variable value: can be used for attributes and for stack variables *)
 and v_value = { v_name : string; v_value : value }
@@ -78,6 +79,48 @@ and obj_desc =
         ob_id : string;
         ob_attributes : v_value list
     }
+
+let create_v_value n v = { v_name = n; v_value = v }
+
+let rec mm_string_of_value = function
+   | VBoolean None -> "Undefined VBoolean"
+   | VChar None -> "Undefined VChar"
+   | VInt None -> "Undefined VInt"
+   | VFloat None -> "Undefined VFloat"
+   | VRefType None -> "Undefined VRefType"
+   | VArray None -> "Undefined VArray"
+   | VBoolean Some b -> string_of_bool b
+   | VChar Some c -> Char.escaped c
+   | VInt Some i -> string_of_int i
+   | VFloat Some f -> string_of_float f
+   | VRefType Some rt -> string_of_vreftype rt
+   | VArray Some va -> string_of_varray va
+
+and string_of_vreftype vr_type =
+    ("Object desc "^vr_type.vref_obj_id^" of class "^vr_type.vref_class_id)
+
+and string_of_varray va =
+    let rec string_of_varray_rec va str =
+        match va with
+        | [] -> str
+        | h :: t -> string_of_varray_rec t (str^"; "^(mm_string_of_value h))
+    in
+    string_of_varray_rec va ""
+
+and string_of_v_value v_value =
+    (v_value.v_name^" -> "^(mm_string_of_value v_value.v_value))
+
+and print_v_value v_value =
+    print_endline (string_of_v_value v_value)
+
+and print_v_value_list v_value_list =
+    List.iter (fun el -> print_endline ((string_of_v_value el)^"; ")) v_value_list
+
+and print_obj_desc obj_desc =
+    print_endline ("Object desc "^obj_desc.ob_id^" of class "^obj_desc.class_id);
+    print_endline "Attribute values";
+    List.iter print_v_value obj_desc.ob_attributes
+
 
 type memory = {
     class_desc_list : class_desc list;
@@ -156,19 +199,20 @@ let rec set_attribute_value_obj_id ob_id a_name a_value mem =
     add_to_heap updated_obj_desc mem
 
 and set_attribute_value obj_desc a_name a_value =
+    let updated_attributes = set_value obj_desc.ob_attributes a_name a_value in
+    print_endline "updated attributes OK";
     {
         class_id = obj_desc.class_id;
         ob_id = obj_desc.ob_id;
-        ob_attributes = set_value obj_desc.ob_attributes a_name a_value
+        ob_attributes = updated_attributes
     }
 
 and set_value v_value_list name value =
     let rec insert_value il ol =
-        match v_value_list with 
+        match il with 
         | [] -> ol
-        | h :: t -> let el = if h.v_name = name then { v_name = name; v_value = value }
-                             else h
-                    in insert_value t (ol @ [h])
+        | { v_name = n; v_value = v } :: t -> if n = name then insert_value t (ol @ [create_v_value n value])
+                                              else insert_value t (ol @ [create_v_value n v])
     in
     insert_value v_value_list []
 
@@ -237,40 +281,9 @@ let print_class_desc_list cdl =
     List.iter (function el -> print_class_desc el) cdl;
     print_endline ""
 
-let rec string_of_value = function
-   | VBoolean None -> "Undefined VBoolean"
-   | VChar None -> "Undefined VChar"
-   | VInt None -> "Undefined VInt"
-   | VFloat None -> "Undefined VFloat"
-   | VRefType None -> "Undefined VRefType"
-   | VArray None -> "Undefined VArray"
-   | VBoolean Some b -> string_of_bool b
-   | VChar Some c -> Char.escaped c
-   | VInt Some i -> string_of_int i
-   | VFloat Some f -> string_of_float f
-   | VRefType Some rt -> string_of_vreftype rt
-   | VArray Some va -> string_of_varray va
 
-
-and string_of_vreftype obj_desc =
-    ("Object desc "^obj_desc.ob_id^" of class "^obj_desc.class_id)
-
-and string_of_varray va =
-    let rec string_of_varray_rec va str =
-        match va with
-        | [] -> str
-        | h :: t -> string_of_varray_rec t (str^"; "^(string_of_value h))
-    in
-    string_of_varray_rec va ""
 
     
-let print_v_value v_value =
-    print_endline (v_value.v_name^" -> "^(string_of_value v_value.v_value))
-
-let print_obj_desc obj_desc =
-    print_endline ("Object desc "^obj_desc.ob_id^" of class "^obj_desc.class_id);
-    print_endline "Attribute values";
-    List.iter print_v_value obj_desc.ob_attributes
 
 let print_heap mem =
     print_endline "Heap:";
