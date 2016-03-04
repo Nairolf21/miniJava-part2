@@ -65,6 +65,7 @@ type value =
     | VChar of char option
     | VInt of int option
     | VFloat of float option
+    | VString of string option
     | VRefType of vref_type option
     | VArray of (value list) option
 

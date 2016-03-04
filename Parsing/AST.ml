@@ -66,7 +66,7 @@ type expression_desc =
   | New of string option * string list * expression list
   | NewArray of Type.t * (expression option) list * expression option
   | Call of expression option * string * expression list
-  | Attr of expression * string
+  | Attr of expression * string (*expression, once evaluated, must correspond to an object desc, to which the attr of name denoted by the string is being accessed*)
   | If of expression * expression * expression
   | Val of value
   | Name of string
