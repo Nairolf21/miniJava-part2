@@ -9,7 +9,15 @@ let rec eval_program mem =
     print_endline "main method found: ";
     print_method "" main_astmethod;
     print_endline "end main method found";
+<<<<<<< HEAD
     mem
+=======
+    print_endline "";
+    print_endline "starting eval";
+    print_endline "-------------";
+    print_endline "";
+    mem = eval_method main_astmethod mem
+>>>>>>> evaluation: layed ground for evaluation in Typing/Eval.ml
 
 and find_main meth_table =
     List.find is_main (sm_value_list meth_table)
@@ -38,6 +46,7 @@ and eval_statement_list stmt_list mem =
     | h :: t -> eval_statement_list t (eval_statement h mem)
 
 and eval_statement statement mem =
+    print_statement "" statement;
     match statement with
     | Block stmt_list -> eval_statement_list stmt_list mem
     | Expr ex -> (eval_expr ex mem).ee_memory
@@ -50,8 +59,8 @@ and eval_expr expr mem =
 
 and mm_value_from_ast_value = function 
     | String s -> Pervasives.failwith "String is not yet implemented in Memory Model"
-    | Int i_s -> VInt Some (int_of_string i_s)
-    | Float f_s -> VFloat Some (float_of_string f_s)
-    | Char c_s -> VChar Some (Char.escaped c_s)
+    | Int i_s -> VInt (Some (int_of_string i_s))
+    | Float f_s -> VFloat (Some (float_of_string f_s))
+    | Char c_s -> VChar c_s
     | Null -> Pervasives.failwith "Null is not yet implemented in Memory Model"
-    | Boolean b -> VBoolean Some b
+    | Boolean b -> VBoolean (Some b)
