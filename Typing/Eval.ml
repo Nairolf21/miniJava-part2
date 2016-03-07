@@ -53,7 +53,17 @@ and eval_statement statement mem =
     | _ -> Pervasives.failwith "statement not yet implemented"
 
 and eval_var_decl_list var_decl_list mem =
-    Pervasives.failwith "eval_var_decl_list not yet implemented"
+    match var_decl_list with
+    | [] -> mem
+    | h :: t -> eval_var_decl_list t (eval_var_decl h mem)
+
+and eval_var_decl var_decl mem =
+    Pervasives.failwith "eval_var_decl not yet implemented"
+    (*
+    match var_decl with
+    | (ty, var_name, None) -> mem 
+    | (ty, var_name, init_expr)
+    *)
 
 and eval_while expr stmt mem =
     Pervasives.failwith "eval_while not yet implemented"
