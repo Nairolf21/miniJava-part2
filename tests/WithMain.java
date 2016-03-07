@@ -83,7 +83,8 @@ public class Main {
         2;
         2.5;
         true;
-
+        new Animal();
+        sirpounce;
     
     }
 }
