@@ -71,8 +71,6 @@ let type_type_info info id env =
 	| Inter -> env (* We don't consider interfaces here *)
 
 let type_asttype exp env = type_type_info exp.info exp.id env
-		
-(* 	let cenv = type_type_info exp.info exp.id env in *)
 
 let rec class_env type_list env=
 	match type_list with
