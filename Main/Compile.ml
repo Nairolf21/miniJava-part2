@@ -6,8 +6,10 @@ let execute lexbuf verbose =
   try 
     let ast = compilationUnit Lexer.token lexbuf in
     print_endline "********************* Successfull parsing *********************";
+    (*
     let type_AST = TypeAST.typing ast [] in
     print_endline "********************* Successfull typing *********************";
+    *)
     let memory = compile_ast ast in
     print_endline "********************* Successful class compilation *********************";
 
