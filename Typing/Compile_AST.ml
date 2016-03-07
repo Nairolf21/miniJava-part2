@@ -11,7 +11,8 @@ and init_memory =
     {
         class_desc_list = [object_class_desc];
         meth_table = StringMap.empty; (* For the moment, the mapping is done with an astmethod, which cannot be done for Object *)
-        heap = []
+        heap = [];
+        stack = StackII.empty_stack
     }
 
 and compile_classes type_list mem = 
@@ -60,7 +61,8 @@ and add_astclass_to_memory astclass class_id parent_id mem =
     {
         meth_table = updated_meth_table;
         class_desc_list = mem.class_desc_list @ [child_class_desc];
-        heap = mem.heap
+        heap = mem.heap;
+        stack = mem.stack
     
     }
 

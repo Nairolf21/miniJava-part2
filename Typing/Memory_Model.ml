@@ -123,12 +123,50 @@ and print_obj_desc obj_desc =
     List.iter print_v_value obj_desc.ob_attributes
 
 
+type stack_el = 
+    | Variable of string * value
+    | Method of AST.astmethod
+
+
 type memory = {
     class_desc_list : class_desc list;
     meth_table : AST.astmethod StringMap.t;
     
-    heap : obj_desc list
+    heap : obj_desc list; (*TODO: we'll have to be tricky to store primary values in heap, for example by storing special obj_desc corresponding to a primary type *)
+    stack : stack_el list
 }
+
+let rec update_class_desc_list cdl mem =
+    {
+        class_desc_list = cdl;
+        meth_table = mem.meth_table;
+        heap = mem.heap;
+        stack = mem.stack
+    }
+
+and update_meth_table mt mem =
+    {
+        class_desc_list = mem.class_desc_list;
+        meth_table = mt;
+        heap = mem.heap;
+        stack = mem.stack
+    }
+
+and update_heap h mem =
+    {
+        class_desc_list = mem.class_desc_list;
+        meth_table = mem.meth_table;
+        heap = h;
+        stack = mem.stack
+    }
+
+and update_stack st mem =
+    {
+        class_desc_list = mem.class_desc_list;
+        meth_table = mem.meth_table;
+        heap = mem.heap;
+        stack = st
+    }
 
 let rec find_class_desc_by_name class_id mem =
     let rec find_class_desc_by_name_rec class_id class_desc_list =
@@ -191,7 +229,8 @@ and add_to_heap obj_desc mem =
     {
         class_desc_list = mem.class_desc_list;
         meth_table = mem.meth_table;
-        heap = add_or_replace_in_heap obj_desc mem
+        heap = add_or_replace_in_heap obj_desc mem;
+        stack = mem.stack
     }
 
 and add_or_replace_in_heap obj_desc mem =
