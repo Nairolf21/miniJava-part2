@@ -139,7 +139,7 @@ let rec find_class_desc_by_name class_id mem =
     in
     find_class_desc_by_name_rec class_id mem.class_desc_list
 
-let rec init_v_value name value_type init_value =
+and init_v_value name value_type init_value =
     match init_value with
     | None -> { v_name = name; v_value = empty_value value_type }
     | Some init_value -> Pervasives.failwith "init_v_value with with an init value is not yet defined"
@@ -160,6 +160,7 @@ and empty_array_value array_type length = VArray None (* I don't know yet if it'
 
 and empty_ref_type r_type = VRefType None
 
+(* Creates new obj_desc and adds it to memory *)
 let rec new_object class_id ob_name mem =
     new_object_from_class_desc (find_class_desc_by_name class_id mem) ob_name mem
 
@@ -175,6 +176,16 @@ and create_attribute_value_list cd_attribute_list attribute_value_list =
     match cd_attribute_list with
     | [] -> attribute_value_list
     | (n, astattribute) :: t -> create_attribute_value_list t (attribute_value_list @ [(init_v_value n astattribute.atype None)])
+
+and obj_desc_from_class_id class_id ob_name mem =
+    obj_desc_from_class_desc (find_class_desc_by_name class_id mem) ob_name mem
+
+and obj_desc_from_class_desc class_desc ob_name mem =
+    {
+        class_id = class_desc.name;
+        ob_id = ob_name;
+        ob_attributes = create_attribute_value_list class_desc.attributes []
+    }
 
 and add_to_heap obj_desc mem =
     {
@@ -225,6 +236,10 @@ and find_obj_desc ob_id mem =
                     else find_obj_desc_rec t
     in
     find_obj_desc_rec mem.heap
+
+and find_vref_type_by_name ob_id mem = 
+    let obj_desc = find_obj_desc ob_id mem in
+    VRefType (Some {vref_class_id = obj_desc.class_id; vref_obj_id = ob_id })
 
 let add_method_to_meth_table method_key astmethod meth_table =
     StringMap.add method_key astmethod meth_table
