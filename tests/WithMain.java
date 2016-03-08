@@ -85,7 +85,6 @@ public class Main {
         2 + 3;
         true;
         new Animal();
-        sirpounce;
         //Animal newAnimal = new Animal();
         int a;
         float b;
@@ -144,6 +143,9 @@ public class Main {
         boolean ne1 = 3 != 2;
         boolean ne2 = 2 != 2;
         boolean ne3 = 1 != 2;
+
+        //Trying to find value in stack by name
+        //add_int;
 
     }
 }

@@ -73,7 +73,7 @@ and eval_expr expr mem =
     match expr.edesc with 
     | New (ta, cip, ael) -> eval_new ta cip ael mem
     | Val v -> { ee_value = (mm_value_from_ast_value v); ee_memory =  mem }
-    | Name n -> { ee_value = (find_vref_type_by_name n mem); ee_memory = mem }
+    | Name n -> eval_name n mem
     | Op (e1, op, e2) -> eval_op e1 e2 op mem
     | _ -> Pervasives.failwith "Eval expr: expression eval not yet implemented"
 
@@ -94,6 +94,15 @@ and eval_new_without_args class_id_path mem =
             ee_value = VRefType (Some {vref_class_id = class_id; vref_obj_id = "" }); 
             ee_memory = mem }
     | h :: t -> Pervasives.failwith "Composed class_id not supported"
+
+(* First look in stack. If not in stack, look in heap. *)
+(* For the moment, only implementing stack *)
+and eval_name name mem =
+    let vv = find_value_in_stack name mem in
+    print_v_value vv;
+    { ee_value = vv.v_value ; ee_memory = mem }
+
+
 
 (* Binary operations. Bitwise op and shift are left un implemented for lack of time *)
 and eval_op e1 e2 op mem =

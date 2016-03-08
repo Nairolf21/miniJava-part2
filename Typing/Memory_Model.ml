@@ -133,9 +133,23 @@ type memory = {
     class_desc_list : class_desc list;
     meth_table : AST.astmethod StringMap.t;
     
+    (* Note: it would be better to build the heap as a list of v_value, because with a list of obj_desc, we cannot store anything else than objects. I won't change it due to the lack of time. *)
     heap : obj_desc list; (*TODO: we'll have to be tricky to store primary values in heap, for example by storing special obj_desc corresponding to a primary type *)
     stack : stack_el list
 }
+
+let rec find_value_in_stack name mem =
+    let rec find_value_in_stack_rec st =
+        match st with 
+        | [] -> Pervasives.failwith ("Variable "^name^" is not in stack")
+        | st -> let (v, new_st) = StackII.pop st in
+                match v with
+                | Method m -> find_value_in_stack_rec new_st
+                | Variable vv -> 
+                        if name = vv.v_name then vv
+                                 else find_value_in_stack_rec new_st
+    in
+    find_value_in_stack_rec mem.stack
 
 let rec update_class_desc_list cdl mem =
     {
@@ -357,7 +371,10 @@ let print_stack mem =
     print_endline "";
     print_endline "Stack";
     print_endline "";
-    List.iter (fun el -> print_endline (string_of_stack_el el)) mem.stack
+    List.iter (fun el -> print_endline (string_of_stack_el el)) mem.stack;
+    print_endline "";
+    print_endline "End of stack";
+    print_endline ""
 
 
 let print_memory mem = 
