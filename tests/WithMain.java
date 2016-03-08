@@ -85,6 +85,6 @@ public class Main {
         true;
         new Animal();
         sirpounce;
-        Animal newAnimal = new Animal();
+        //Animal newAnimal = new Animal();
     }
 }

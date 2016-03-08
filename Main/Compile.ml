@@ -25,6 +25,9 @@ let execute lexbuf verbose =
     Memory_Model.print_memory memory;
 
     let memory = Eval.eval_program memory in
+
+    Memory_Model.print_stack memory;
+
     if verbose then AST.print_program ast 
   with 
     | Error ->
