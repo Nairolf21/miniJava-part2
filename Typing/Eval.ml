@@ -95,6 +95,7 @@ and eval_new_without_args class_id_path mem =
             ee_memory = mem }
     | h :: t -> Pervasives.failwith "Composed class_id not supported"
 
+(* Binary operations. Bitwise op and shift are left un implemented for lack of time *)
 and eval_op e1 e2 op mem =
     let ee1 = eval_expr e1 mem in
     let ee2 = eval_expr e2 ee1.ee_memory in
@@ -114,6 +115,7 @@ and eval_op e1 e2 op mem =
     }
 
 
+(* Numeric operators *)
 and eval_add v1 v2 = 
     match v1, v2 with
     | (VInt Some v1), (VInt Some v2) -> VInt (Some (v1 + v2))
@@ -128,7 +130,7 @@ and eval_sub v1 v2 =
     | (VFloat Some v1), (VFloat Some v2) -> VFloat (Some (v1 -. v2))
     | (VInt Some v1), (VFloat Some v2) -> VFloat (Some ((float_of_int v1) -. v2))
     | (VFloat Some v1), (VInt Some v2) -> VFloat (Some (v1 -. (float_of_int v2)))
-    | _ -> Pervasives.failwith "eval_add: incompatible types"
+    | _ -> Pervasives.failwith "eval_sub: incompatible types"
 
 and eval_mul v1 v2 = 
     match v1, v2 with
@@ -136,7 +138,7 @@ and eval_mul v1 v2 =
     | (VFloat Some v1), (VFloat Some v2) -> VFloat (Some (v1 *. v2))
     | (VInt Some v1), (VFloat Some v2) -> VFloat (Some ((float_of_int v1) *. v2))
     | (VFloat Some v1), (VInt Some v2) -> VFloat (Some (v1 *. (float_of_int v2)))
-    | _ -> Pervasives.failwith "eval_add: incompatible types"
+    | _ -> Pervasives.failwith "eval_mul: incompatible types"
 
 and eval_div v1 v2 = 
     (match v2 with
@@ -148,8 +150,14 @@ and eval_div v1 v2 =
     | (VFloat Some v1), (VFloat Some v2) -> VFloat (Some (v1 /. v2))
     | (VInt Some v1), (VFloat Some v2) -> VFloat (Some ((float_of_int v1) /. v2))
     | (VFloat Some v1), (VInt Some v2) -> VFloat (Some (v1 /. (float_of_int v2)))
-    | _ -> Pervasives.failwith "eval_add: incompatible types"
+    | _ -> Pervasives.failwith "eval_div: incompatible types"
 
+and eval_mod v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VInt (Some (v1 mod v2))
+    | _ -> Pervasives.failwith "eval_mod: incompatible types"
+
+(* Conditional boolean operations *)
 and eval_cor v1 v2 =
     match v1, v2 with
     | (VBoolean Some v1), (VBoolean Some v2) -> VBoolean (Some (v1 || v2))
@@ -159,6 +167,7 @@ and eval_cand v1 v2 =
     match v1, v2 with
     | (VBoolean Some v1), (VBoolean Some v2) -> VBoolean (Some (v1 && v2))
     | _ -> Pervasives.failwith "Cannot apply cand on non booleans"
+
 
 and mm_value_from_ast_value = function 
     | String s -> Pervasives.failwith "String is not yet implemented in Memory Model"
