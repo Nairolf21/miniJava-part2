@@ -91,5 +91,8 @@ public class Main {
         Animal animal_test;
         int[] array_test;
         int c, d;
+        int initialized_int = 2;
+        float initialized_float = 2.5;
+        int add_int = 2 + 3;
     }
 }
