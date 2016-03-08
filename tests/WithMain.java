@@ -82,6 +82,7 @@ public class Main {
     public static void main(String[] args) {
         2;
         2.5;
+        2 + 3;
         true;
         new Animal();
         sirpounce;
@@ -104,7 +105,17 @@ public class Main {
         float add_float = 2.2 + 3.5;
         float add_float2 = 2 + 3.5;
         float add_float3 = 2.5 + 3;
+        int mult_int = 2 * 3;
+        int mult_add_int = 2 * 3 + 5;
+        float mult_float = 2.5 * 3;
+        float mult_add_float = 2 * 3.5 + 5;
+        int div_int = 6 / 2;
+        int div_int2 = 5 / 2;
 
+        boolean cor_boolean = true || false;
+        boolean cor_boolean2 = false || true;
+        boolean cor_boolean3 = true || true;
+        boolean cor_boolean4 = false || false;
 
     }
 }
