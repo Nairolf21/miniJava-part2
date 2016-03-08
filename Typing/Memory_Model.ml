@@ -183,7 +183,7 @@ let rec find_class_desc_by_name class_id mem =
 and init_v_value name value_type init_value =
     match init_value with
     | None -> { v_name = name; v_value = empty_value value_type }
-    | Some init_value -> Pervasives.failwith "init_v_value with with an init value is not yet defined"
+    | Some init_value -> { v_name = name; v_value = init_value }
 
 and empty_value = function
     | Void -> Pervasives.failwith "Void is not a variable type"

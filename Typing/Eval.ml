@@ -61,7 +61,10 @@ and eval_var_decl_list var_decl_list mem =
 and eval_var_decl var_decl mem =
     match var_decl with
     | (ty, var_name, None) -> push_to_callstack (Variable (init_v_value var_name ty None)) mem 
-    | (ty, var_name, init_expr) -> Pervasives.failwith "not yet implemented" (*push_to_callstack (Variable (init_v_value var_name ty (Some (eval_expr init_expr mem)))) mem *)
+    | (ty, var_name, Some init_expr) -> 
+            let ee = eval_expr init_expr mem in
+            let init_value = init_v_value var_name ty (Some ee.ee_value) in
+            push_to_callstack (Variable init_value) ee.ee_memory
 
 and eval_while expr stmt mem =
     Pervasives.failwith "eval_while not yet implemented"
