@@ -70,6 +70,44 @@ let type_type_info info id env =
 					else raise (Class_already_declared(id))
 	| Inter -> env (* We don't consider interfaces here *)
 
+(* 2nd pass : check if attribute in env *)
+let rec attr_exists attr attr_env =
+		match attr_env with
+		[] -> false
+		| a:: t -> if a=attr then true
+							else attr_exists attr t
+
+let isPrimitiveType a = 
+  match (Type.stringOf a.atype) with
+  | "boolean"
+  | "char"   
+  | "byte"   
+  | "short"  
+  | "int"    
+  | "long"   
+  | "float"  
+  | "double" 
+  | "String"
+      -> true
+  | _ -> false
+
+
+let rec type_attributes id attr_list env =
+  match attr_list with
+    | [] -> []
+    | a::t ->   
+    (* check if primitive type (isPrimitiveType defined in Type.ml) *)
+			    if not (isPrimitiveType a)
+			    then raise (Unknown_type(Type.stringOf a.atype))
+				else a::(type_attributes id t env)
+
+(* 2nd pass : type class body *)
+let rec type_class_body env =
+  match env with
+    | [] -> []
+    | (id, c):: t -> let nenv = type_attributes id c.cattributes env 
+    					in nenv@(type_class_body t)
+      
 let type_asttype exp env = type_type_info exp.info exp.id env
 
 let rec class_env type_list env=
@@ -79,9 +117,9 @@ let rec class_env type_list env=
 							in nenv @ class_env t nenv) 
 				in (meth_env nenv2)
 
-
-
 let typing exp env = 
 	let classenv = class_env exp.type_list env in 
 		if (check_cparent classenv) then (print_endline "heritage ok");
+		type_class_body classenv
+
 
