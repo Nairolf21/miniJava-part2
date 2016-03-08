@@ -91,8 +91,20 @@ public class Main {
         Animal animal_test;
         int[] array_test;
         int c, d;
+        boolean uninitialized_bool;
+
+        //Variable declaration with init value
         int initialized_int = 2;
         float initialized_float = 2.5;
+        booleandkfg initialized_bool = true;
+
+        //Initialization with arithmetic expressions, to test evaluation
+        //of arithmetic expressions
         int add_int = 2 + 3;
+        float add_float = 2.2 + 3.5;
+        float add_float2 = 2 + 3.5;
+        float add_float3 = 2.5 + 3;
+
+
     }
 }
