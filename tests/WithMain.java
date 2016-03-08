@@ -86,5 +86,10 @@ public class Main {
         new Animal();
         sirpounce;
         //Animal newAnimal = new Animal();
+        int a;
+        float b;
+        Animal animal_test;
+        int[] array_test;
+        int c, d;
     }
 }
