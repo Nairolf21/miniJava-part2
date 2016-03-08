@@ -168,6 +168,9 @@ and update_stack st mem =
         stack = st
     }
 
+and push_to_callstack el mem =
+    update_stack (StackII.push el mem.stack) mem
+
 let rec find_class_desc_by_name class_id mem =
     let rec find_class_desc_by_name_rec class_id class_desc_list =
         match class_desc_list with
@@ -343,6 +346,17 @@ let print_class_desc_list cdl =
 let print_heap mem =
     print_endline "Heap:";
     List.iter print_obj_desc mem.heap
+
+let string_of_stack_el el =
+    match el with
+    | Variable (name, v) -> (name^": "^(mm_string_of_value v))
+    | Method am -> ("method: "^am.mname)
+
+let print_stack mem =
+    print_endline "";
+    print_endline "Stack";
+    print_endline "";
+    List.iter (fun el -> print_endline (string_of_stack_el el)) mem.stack
 
 
 let print_memory mem = 

@@ -12,7 +12,7 @@ let rec eval_program mem =
     print_endline "starting eval";
     print_endline "-------------";
     print_endline "";
-    mem = eval_method main_astmethod mem
+    eval_method main_astmethod mem
 
 and find_main meth_table =
     List.find is_main (sm_value_list meth_table)
@@ -33,6 +33,7 @@ and is_method_static astmethod =
     List.exists is_static_modifier astmethod.mmodifiers
 
 and eval_method ast_method mem =
+    let mem = push_to_callstack (Method ast_method) mem in
     eval_statement_list ast_method.mbody mem
     
 and eval_statement_list stmt_list mem =
