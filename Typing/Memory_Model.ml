@@ -124,7 +124,7 @@ and print_obj_desc obj_desc =
 
 
 type stack_el = 
-    | Variable of string * value
+    | Variable of v_value
     | Method of AST.astmethod
 
 
@@ -349,7 +349,7 @@ let print_heap mem =
 
 let string_of_stack_el el =
     match el with
-    | Variable (name, v) -> (name^": "^(mm_string_of_value v))
+    | Variable v_v -> string_of_v_value v_v
     | Method am -> ("method: "^am.mname)
 
 let print_stack mem =

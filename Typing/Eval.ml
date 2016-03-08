@@ -59,12 +59,9 @@ and eval_var_decl_list var_decl_list mem =
     | h :: t -> eval_var_decl_list t (eval_var_decl h mem)
 
 and eval_var_decl var_decl mem =
-    Pervasives.failwith "eval_var_decl not yet implemented"
-    (*
     match var_decl with
-    | (ty, var_name, None) -> mem 
-    | (ty, var_name, init_expr)
-    *)
+    | (ty, var_name, None) -> push_to_callstack (Variable (init_v_value var_name ty None)) mem 
+    | (ty, var_name, init_expr) -> Pervasives.failwith "not yet implemented" (*push_to_callstack (Variable (init_v_value var_name ty (Some (eval_expr init_expr mem)))) mem *)
 
 and eval_while expr stmt mem =
     Pervasives.failwith "eval_while not yet implemented"
