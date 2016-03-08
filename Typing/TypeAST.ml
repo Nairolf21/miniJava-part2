@@ -111,21 +111,6 @@ let rec type_attributes attr_list env =
 			    if (attr_decl attr_list a.aname) then raise (Attribute_already_declared(a.aname))
 				else a::(type_attributes t env)
 
-
-(*       if (isVar env a1.aname)
-      then attribute_clash a1.aname a1.aloc;
-      let new_env = addVar env a1.aname (fromString atype_string) in
-      match a1.adefault with
-        | None -> check_attributes c others new_env
-        | Some e -> 
-          check_expr e env;
-          match e.etype with
-            | None -> typing_error e.eloc
-            | Some t -> 
-              if not (isSubtypeOf env (fromString atype_string) t)
-              then  not_subtype (stringOf t) atype_string a1.aloc;
-              check_attributes c others new_env *)
-
 (* 2nd pass : type class body *)
 let rec type_class_body env =
   match env with
