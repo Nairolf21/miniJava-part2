@@ -108,7 +108,7 @@ let rec type_attributes attr_list env =
 			    if not (isPrimitiveType a)
 			    then raise (Unknown_type(Type.stringOf a.atype));
 			    (* check if the attribute was already declared *)
-			    if (attr_decl attr_list a.aname) then raise (Attribute_already_declared(a.aname))
+			    if not (attr_decl attr_list a.aname) then raise (Attribute_already_declared(a.aname))
 				else a::(type_attributes t env)
 
 (* 2nd pass : type class body *)
