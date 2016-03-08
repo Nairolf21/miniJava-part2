@@ -74,6 +74,7 @@ and eval_expr expr mem =
     | New (ta, cip, ael) -> eval_new ta cip ael mem
     | Val v -> { ee_value = (mm_value_from_ast_value v); ee_memory =  mem }
     | Name n -> { ee_value = (find_vref_type_by_name n mem); ee_memory = mem }
+    | Op (e1, op, e2) -> eval_op e1 e2 op mem
     | _ -> Pervasives.failwith "Eval expr: expression eval not yet implemented"
 
 and eval_new type_arguments class_id_path arg_expr_list mem =
@@ -93,6 +94,28 @@ and eval_new_without_args class_id_path mem =
             ee_value = VRefType (Some {vref_class_id = class_id; vref_obj_id = "" }); 
             ee_memory = mem }
     | h :: t -> Pervasives.failwith "Composed class_id not supported"
+
+and eval_op e1 e2 op mem =
+    let ee1 = eval_expr e1 mem in
+    let ee2 = eval_expr e2 ee1.ee_memory in
+    let result v1 v2 op =
+        match op with
+        | Op_add -> eval_add v1 v2
+        | _ -> Pervasives.failwith "inline_op eval not yet implemented"
+    in
+    { 
+        ee_value = (result ee1.ee_value ee2.ee_value op);
+        ee_memory = ee2.ee_memory
+    }
+
+
+and eval_add v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VInt (Some (v1 + v2))
+    | (VFloat Some v1), (VFloat Some v2) -> VFloat (Some (v1 +. v2))
+    | (VInt Some v1), (VFloat Some v2) -> VFloat (Some ((float_of_int v1) +. v2))
+    | (VFloat Some v1), (VInt Some v2) -> VFloat (Some (v1 +. (float_of_int v2)))
+    | _ -> Pervasives.failwith "eval_add: incompatible types"
 
 and mm_value_from_ast_value = function 
     | String s -> Pervasives.failwith "String is not yet implemented in Memory Model"

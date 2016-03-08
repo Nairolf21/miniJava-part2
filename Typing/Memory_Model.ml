@@ -60,6 +60,7 @@ and create_child_attribute_list parent_attributes child_attributes =
 
 
 (* Values (instances, variable values, heap) *)
+(* Note: it may have been an error to over type values execution side. Maybe a Numeric type for Int and Float would have sufficed *)
 type value =
     | VBoolean of bool option
     | VChar of char option
