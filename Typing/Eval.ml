@@ -105,8 +105,15 @@ and eval_op e1 e2 op mem =
         | Op_sub -> eval_sub v1 v2
         | Op_mul -> eval_mul v1 v2
         | Op_div -> eval_div v1 v2
+        | Op_mod -> eval_mod v1 v2
         | Op_cor -> eval_cor v1 v2
         | Op_cand -> eval_cand v1 v2
+        | Op_gt -> eval_gt v1 v2
+        | Op_lt -> eval_lt v1 v2
+        | Op_ge -> eval_ge v1 v2
+        | Op_le -> eval_le v1 v2
+        | Op_eq -> eval_eq v1 v2
+        | Op_ne -> eval_ne v1 v2
         | _ -> Pervasives.failwith "inline_op eval not yet implemented"
     in
     { 
@@ -168,6 +175,55 @@ and eval_cand v1 v2 =
     | (VBoolean Some v1), (VBoolean Some v2) -> VBoolean (Some (v1 && v2))
     | _ -> Pervasives.failwith "Cannot apply cand on non booleans"
 
+(* Comparison operators *)
+
+and eval_gt v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VBoolean (Some (v1 > v2))
+    | (VFloat Some v1), (VFloat Some v2) -> VBoolean (Some (v1 > v2))
+    | (VInt Some v1), (VFloat Some v2) -> VBoolean (Some ((float_of_int v1) > v2))
+    | (VFloat Some v1), (VInt Some v2) -> VBoolean (Some (v1 > (float_of_int v2)))
+    | _ -> Pervasives.failwith "eval_gt: incompatible types"
+
+and eval_lt v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VBoolean (Some (v1 < v2))
+    | (VFloat Some v1), (VFloat Some v2) -> VBoolean (Some (v1 < v2))
+    | (VInt Some v1), (VFloat Some v2) -> VBoolean (Some ((float_of_int v1) < v2))
+    | (VFloat Some v1), (VInt Some v2) -> VBoolean (Some (v1 < (float_of_int v2)))
+    | _ -> Pervasives.failwith "eval_lt: incompatible types"
+
+and eval_ge v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VBoolean (Some (v1 >= v2))
+    | (VFloat Some v1), (VFloat Some v2) -> VBoolean (Some (v1 >= v2))
+    | (VInt Some v1), (VFloat Some v2) -> VBoolean (Some ((float_of_int v1) >= v2))
+    | (VFloat Some v1), (VInt Some v2) -> VBoolean (Some (v1 >= (float_of_int v2)))
+    | _ -> Pervasives.failwith "eval_ge: incompatible types"
+
+and eval_le v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VBoolean (Some (v1 <= v2))
+    | (VFloat Some v1), (VFloat Some v2) -> VBoolean (Some (v1 <= v2))
+    | (VInt Some v1), (VFloat Some v2) -> VBoolean (Some ((float_of_int v1) <= v2))
+    | (VFloat Some v1), (VInt Some v2) -> VBoolean (Some (v1 <= (float_of_int v2)))
+    | _ -> Pervasives.failwith "eval_le: incompatible types"
+
+and eval_eq v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VBoolean (Some (v1 = v2))
+    | (VFloat Some v1), (VFloat Some v2) -> VBoolean (Some (v1 = v2))
+    | (VInt Some v1), (VFloat Some v2) -> VBoolean (Some ((float_of_int v1) = v2))
+    | (VFloat Some v1), (VInt Some v2) -> VBoolean (Some (v1 = (float_of_int v2)))
+    | _ -> Pervasives.failwith "eval_eq: incompatible types"
+
+and eval_ne v1 v2 = 
+    match v1, v2 with
+    | (VInt Some v1), (VInt Some v2) -> VBoolean (Some (v1 <> v2))
+    | (VFloat Some v1), (VFloat Some v2) -> VBoolean (Some (v1 <> v2))
+    | (VInt Some v1), (VFloat Some v2) -> VBoolean (Some ((float_of_int v1) <> v2))
+    | (VFloat Some v1), (VInt Some v2) -> VBoolean (Some (v1 <> (float_of_int v2)))
+    | _ -> Pervasives.failwith "eval_ne: incompatible types"
 
 and mm_value_from_ast_value = function 
     | String s -> Pervasives.failwith "String is not yet implemented in Memory Model"
