@@ -118,5 +118,32 @@ public class Main {
         boolean cor_boolean3 = true || true;
         boolean cor_boolean4 = false || false;
 
+        boolean gt1 = 2 > 2;
+        boolean gt2 = 2. > 2;
+        boolean gt3 = 2 > 2.;
+        boolean gt4 = 3 > 2;
+        boolean gt5 = 1 > 2;
+        boolean gt6 = 3. > 2.;
+
+        boolean lt1 = 3 < 2;
+        boolean lt2 = 2 < 2;
+        boolean lt3 = 1 < 2;
+
+        boolean le1 = 3 <= 2;
+        boolean le2 = 2 <= 2;
+        boolean le3 = 1 <= 2;
+
+        boolean ge1 = 3 >= 2;
+        boolean ge2 = 2 >= 2;
+        boolean ge3 = 1 >= 2;
+
+        boolean eq1 = 3 == 2;
+        boolean eq2 = 2 == 2;
+        boolean eq3 = 1 == 2;
+
+        boolean ne1 = 3 != 2;
+        boolean ne2 = 2 != 2;
+        boolean ne3 = 1 != 2;
+
     }
 }
