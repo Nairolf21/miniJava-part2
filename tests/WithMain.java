@@ -111,6 +111,7 @@ public class Main {
         float mult_add_float = 2 * 3.5 + 5;
         int div_int = 6 / 2;
         int div_int2 = 5 / 2;
+        int mod_int = 5 % 2;
 
         boolean cor_boolean = true || false;
         boolean cor_boolean2 = false || true;
