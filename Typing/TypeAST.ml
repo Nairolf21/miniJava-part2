@@ -92,21 +92,46 @@ let isPrimitiveType a =
   | _ -> false
 
 
-let rec type_attributes id attr_list env =
+(* check if the attribute was already declared *)
+let rec attr_decl attr_list attr_name=
+		match attr_list with
+		[] -> false
+		| a:: t -> if a.aname=attr_name then true (* (id, c) *)
+					else attr_decl t attr_name
+
+
+let rec type_attributes attr_list env =
   match attr_list with
     | [] -> []
     | a::t ->   
-    (* check if primitive type (isPrimitiveType defined in Type.ml) *)
+    			(* check if primitive type (isPrimitiveType defined in Type.ml) *)
 			    if not (isPrimitiveType a)
-			    then raise (Unknown_type(Type.stringOf a.atype))
-				else a::(type_attributes id t env)
+			    then raise (Unknown_type(Type.stringOf a.atype));
+			    (* check if the attribute was already declared *)
+			    if (attr_decl attr_list a.aname) then raise (Attribute_already_declared(a.aname))
+				else a::(type_attributes t env)
+
+
+(*       if (isVar env a1.aname)
+      then attribute_clash a1.aname a1.aloc;
+      let new_env = addVar env a1.aname (fromString atype_string) in
+      match a1.adefault with
+        | None -> check_attributes c others new_env
+        | Some e -> 
+          check_expr e env;
+          match e.etype with
+            | None -> typing_error e.eloc
+            | Some t -> 
+              if not (isSubtypeOf env (fromString atype_string) t)
+              then  not_subtype (stringOf t) atype_string a1.aloc;
+              check_attributes c others new_env *)
 
 (* 2nd pass : type class body *)
 let rec type_class_body env =
   match env with
     | [] -> []
-    | (id, c):: t -> let nenv = type_attributes id c.cattributes env 
-    					in nenv@(type_class_body t)
+    | (id, c):: t -> let nenv = type_attributes c.cattributes env in nenv@(type_class_body t)
+
       
 let type_asttype exp env = type_type_info exp.info exp.id env
 

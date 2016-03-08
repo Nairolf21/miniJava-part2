@@ -1,5 +1,6 @@
 class A{
-	B b;
+	int b;
+	double b;
 	String s = 2;
 }
 
