@@ -12,7 +12,10 @@ let execute lexbuf verbose =
     *)
     let memory = compile_ast ast in
     print_endline "********************* Successful class compilation *********************";
-(*
+
+(*  --- Uncomment to test heap and method table with test file tests/Animal.java 
+ *
+ *
     let memory = Memory_Model.new_object "Animal" "animal" memory in
     let memory = Memory_Model.new_object "Cat" "mrtinkle" memory in
     let memory = Memory_Model.new_object "Cat" "sirpounce" memory in
