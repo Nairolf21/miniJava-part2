@@ -2,7 +2,28 @@ open Parser
 open TypeAST
 open Compile_AST
 
-let execute lexbuf verbose = 
+let fill_mem filename memory =
+    print_endline ("fill_mem, filename: "^filename);
+    if (filename = "tests/Eval/Inheritance.java" || filename = "tests/Eval/WithMain.java") then
+        begin
+
+        let memory = Memory_Model.new_object "Animal" "animal" memory in
+        let memory = Memory_Model.new_object "Cat" "mrtinkle" memory in
+        let memory = Memory_Model.new_object "Cat" "sirpounce" memory in
+
+
+        let memory = Memory_Model.set_attribute_value_obj_id "animal" "legNumber" (Memory_Model.VInt (Some 2)) memory in
+        let memory = Memory_Model.set_attribute_value_obj_id "mrtinkle" "legNumber" (Memory_Model.VInt (Some 4)) memory in
+        Memory_Model.set_attribute_value_obj_id "sirpounce" "livesLeft" (Memory_Model.VInt (Some 7)) memory
+        end
+    else 
+        begin
+        print_endline "compile: dont add cats";
+        memory
+        end
+
+
+let execute lexbuf verbose filename = 
   try 
     let ast = compilationUnit Lexer.token lexbuf in
     print_endline "********************* Successfull parsing *********************";
@@ -12,18 +33,8 @@ let execute lexbuf verbose =
     let memory = compile_ast ast in
     print_endline "********************* Successful class compilation *********************";
 
-(*  --- Uncomment to test heap and method table with test file tests/Animal.java 
- *
- *
-    let memory = Memory_Model.new_object "Animal" "animal" memory in
-    let memory = Memory_Model.new_object "Cat" "mrtinkle" memory in
-    let memory = Memory_Model.new_object "Cat" "sirpounce" memory in
+    let memory = fill_mem filename memory in
 
-
-    let memory = Memory_Model.set_attribute_value_obj_id "animal" "legNumber" (Memory_Model.VInt (Some 2)) memory in
-    let memory = Memory_Model.set_attribute_value_obj_id "mrtinkle" "legNumber" (Memory_Model.VInt (Some 4)) memory in
-    let memory = Memory_Model.set_attribute_value_obj_id "sirpounce" "livesLeft" (Memory_Model.VInt (Some 7)) memory in
-*)
     Memory_Model.print_memory memory;
 
     let memory = Eval.eval_program memory in
@@ -38,3 +49,5 @@ let execute lexbuf verbose =
     | Error.Error(e,l) ->
       Error.report_error e;
       Location.print l
+
+
