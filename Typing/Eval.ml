@@ -5,10 +5,6 @@ type evaluated_expr = { ee_value : Memory_Model.value; ee_memory : Memory_Model.
 
 let rec eval_program mem =
     let main_astmethod = find_main mem.meth_table in
-    print_endline "main method found: ";
-    print_method "" main_astmethod;
-    print_endline "end main method found";
-    print_endline "";
     print_endline "starting eval";
     print_endline "-------------";
     print_endline "";
@@ -43,7 +39,6 @@ and eval_statement_list stmt_list mem =
 
 (* AST.statement -> Memory_Model.memory -> Memory_Model.memory *)
 and eval_statement statement mem =
-    print_statement "" statement;
     match statement with
     | VarDecl var_decl_list -> eval_var_decl_list var_decl_list mem
     | Block stmt_list -> eval_statement_list stmt_list mem

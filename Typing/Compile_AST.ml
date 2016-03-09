@@ -34,9 +34,12 @@ and compile_class type_list astclass class_id mem =
         end
 
 and mem_with_parent type_list parent_asttype parent_id mem =
+    print_endline ("mem_with_parent for parent_id: "^parent_id^", type_list");
+    List.iter (fun el -> print_string el.id; print_string "; ") type_list;
+    print_endline "";
     match parent_asttype with
-    | None -> if parent_id = "Object" then mem
-              else failwith (parent_id^"not found in the AST")
+    | None -> if (parent_id = "Object" || (is_in_class_desc_list parent_id mem)) then mem
+              else failwith (parent_id^" not found in the AST nor in the already compiled classes")
     | Some parent_asttype -> compile_asttype type_list parent_asttype mem
 
 and is_astclass_compiled class_id mem =

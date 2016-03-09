@@ -195,6 +195,15 @@ let rec find_class_desc_by_name class_id mem =
     in
     find_class_desc_by_name_rec class_id mem.class_desc_list
 
+and is_in_class_desc_list class_id mem =
+    let rec is_in_class_desc_list_rec class_desc_list =
+        match class_desc_list with
+        | [] -> false
+        | h :: t -> if h.name = class_id then true
+                    else is_in_class_desc_list_rec t
+    in
+    is_in_class_desc_list_rec mem.class_desc_list
+
 and init_v_value name value_type init_value =
     match init_value with
     | None -> { v_name = name; v_value = empty_value value_type }
@@ -316,7 +325,7 @@ let print_meth_table_line name astmethod =
     print_endline ""
 
 let print_method_table meth_table =
-    print_endline "Method table (comp_name: ast_name)";
+    print_endline "Method table (comp_name: method_content)";
     print_endline "";
     StringMap.iter print_meth_table_line meth_table;
     print_endline ""
